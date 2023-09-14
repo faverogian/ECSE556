@@ -1,0 +1,55 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{parskip}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage[framed, numbered]{mcode}
+\usepackage[margin=3cm]{geometry}
+\usepackage{subfig}
+
+\hypersetup{
+        hidelinks
+}
+
+\lstset{basicstyle=\fontsize{9}{12}\ttfamily}
+
+\begin{document}
+
+\title{Machine Learning in Network Biology\\Homework 1}
+\author{
+        Dr. Amin Emad \\ \\
+        Gian Favero: 261157396 \\
+}
+\date{October 6th, 2023}
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Transcriptomic data refers to a collection of RNA molecules, or transcripts, present in cell tissues at a reference time. Typically, these molecules are generated in a cell through the process of transcription of DNA into RNA. This data contains insights into the expression levels of genes in a cell which can be used to predict various items like disease, stimuli response, and development, among others.
+
+Analyzing transcriptomic data is a complex task due to the large number of genes present in a cell. However, successful analysis of this data can lead to important discoveries in gene function, networks, and pathways involved in biological processes. This is especially important in the field of network biology where the goal is to understand the structure and function of biological networks.
+
+Several classical machine learning approaches can be used when analyzing transcriptomic data. These include dimensionality reduction, clustering, and regression. All three of these particular approaches will be explored in this assignment using popular Python libraries to gain some insight into the data provided. Gene expression data was provided alongside this assignment within a file called \\ \verb|gdsc_expr_postCB.csv|. The file contains rows that begin with a gene name and are taken to be features of the data, while columns represent gene lines, or instances. 
+
+\section{Part 1: Dimensionality Reduction}
+Dimensionality reduction is a technique used to reduce the number of features in a dataset. This is done by projecting the data onto a lower dimensional space and finding a new, simpler set of features that can be used to represent the original data. Memory usage, computational efficiency, and visualization are all advantages of dimensionality reduction.
+
+Several dimensionality reduction techniques are explored in this assignment. These include Principal Component Analysis (PCA), UMAP, and t-SNE algorithms.
+
+\subsection{Principal Component Analysis}
+A PCA algorithm was implemented using the \verb|sklearn.decomposition.PCA| library in addition to peripheral libraries for data manipulation (\verb|numpy|) and visualization (\verb|matplotlib|).
+
+
+
+\end{document}
