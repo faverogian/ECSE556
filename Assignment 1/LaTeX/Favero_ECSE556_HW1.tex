@@ -15,6 +15,9 @@
 \usepackage[margin=3cm]{geometry}
 \usepackage{subfig}
 
+\usepackage{biblatex} %Imports biblatex package
+\addbibresource{references.bib} %Import the bibliography file
+
 \hypersetup{
         hidelinks
 }
@@ -49,9 +52,23 @@ Several dimensionality reduction techniques are explored in this assignment. The
 
 \subsection{Principal Component Analysis}
 \subsubsection{Theory}
+
+The following is adapted from Goodfellow et al \cite{GoodBengCour16}.
+
 PCA is a lossy compression technique that is used to reduce the dimensionality of a dataset. It is lossy because the original data is stored in a way that uses less memory, but loses some precision in the process. Ideally, the data is compressed in a way that preserves the most important information.
 
+For a set of \textit{m} data points $\textbf{x}^{(i)}$ $\in$ $\mathbb{R}^n$, PCA finds a lower dimensional representation of the data by representing it as a code vector $\textbf{c}^{(i)}$ $\in$ $\mathbb{R}^l$ where $l < n$. The goal of PCA is to find a function $f$ such that $\textbf{c}^{(i)}$ = $f(\textbf{x}^{(i)})$ and a decoding function $g$ which provides $x \approx g(f(x))$. This is simply done using a decoding matrix, $\textbf{D} \in \mathbb{R}^{n \times l}$ which has columns that are orthogonal and have a unit norm. Following this, the code vector is given by:
+\begin{align*}
+        f(\textbf{x}) = \textbf{c} = \textbf{D}^T\textbf{x}
+\end{align*}
+and the reconstructed input is given by:
+\begin{align*}
+        g(\textbf{c}) = \textbf{x} = \textbf{D}\textbf{D}^T\textbf{x}
+\end{align*} 
 
+Using a closed-form or numerical optimization method, the decoding matrix can be found by minimizing the reconstruction error, $||\textbf{x} - \textbf{D}\textbf{D}^T\textbf{x}||_2^2$ across each point in the dataset.
+ 
+Often times $l$ is a parameter selected by the user. For visual purposes, $l$ is typically chosen as 2 such that the compressed data can be plotted on a Cartesian plane.  
 
 \subsubsection{Implementation}
 A PCA algorithm was implemented using the \verb|sklearn.decomposition.PCA| library in addition to peripheral libraries for data manipulation (\verb|numpy|) and visualization (\verb|matplotlib|).
@@ -95,5 +112,8 @@ A PCA algorithm was implemented using the \verb|sklearn.decomposition.PCA| libra
 \subsubsection{Rand Index}
 
 \subsubsection{Adjusted Rand Index}
+
+\newpage
+\printbibliography
 
 \end{document}

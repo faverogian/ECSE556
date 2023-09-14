@@ -9,3 +9,8 @@ venv/
 *.synctex.gz
 *.toc
 *.out
+
+# Exclude bibtex files
+*.bbl
+*.bcf
+*.xml
