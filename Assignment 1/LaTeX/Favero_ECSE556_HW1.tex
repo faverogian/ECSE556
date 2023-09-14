@@ -14,9 +14,7 @@
 \usepackage[framed, numbered]{mcode}
 \usepackage[margin=3cm]{geometry}
 \usepackage{subfig}
-
-\usepackage{biblatex} %Imports biblatex package
-\addbibresource{references.bib} %Import the bibliography file
+\usepackage[numbers]{natbib}
 
 \hypersetup{
         hidelinks
@@ -28,8 +26,8 @@
 
 \title{Machine Learning in Network Biology\\Homework 1}
 \author{
-        Dr. Amin Emad \\ \\
-        Gian Favero: 261157396 \\
+    Dr. Amin Emad \\ \\
+    Gian Favero: 261157396 \\
 }
 \date{October 6th, 2023}
 \maketitle
@@ -49,30 +47,45 @@ Dimensionality reduction is a technique used to reduce the number of features in
 Several dimensionality reduction techniques are explored in this assignment. These include Principal Component Analysis (PCA), UMAP, and t-SNE algorithms.
 
 \subsection{Theory}
+\subsubsection{Principal Component Analysis}
 The following is adapted from Goodfellow et al. \cite{GoodBengCour16}.
 
-\subsubsection{Principal Component Analysis}
 For a set of \textit{m} data points $\textbf{x}^{(i)}$ $\in$ $\mathbb{R}^n$, PCA finds a lower dimensional representation of the data by representing it as a code vector $\textbf{c}^{(i)}$ $\in$ $\mathbb{R}^l$ where $l < n$. The goal of PCA is to find a function $f$ such that $\textbf{c}^{(i)}$ = $f(\textbf{x}^{(i)})$ and a decoding function $g$ which provides $\textbf{x} \approx g(f(\textbf{x}))$. This is simply done using a decoding matrix, $\textbf{D} \in \mathbb{R}^{n \times l}$ which has columns that are orthogonal and have a unit norm. Following this, the code vector is given by:
 \begin{align*}
-        \textbf{c} = f(\textbf{x}) = \textbf{D}^T\textbf{x}
+    \textbf{c} = f(\textbf{x}) = \textbf{D}^T\textbf{x}
 \end{align*}
 and the reconstructed input is given by:
 \begin{align*}
-        \textbf{x} \approx g(\textbf{c}) = \textbf{D}\textbf{D}^T\textbf{x}
+    \textbf{x} \approx g(\textbf{c}) = \textbf{D}\textbf{D}^T\textbf{x}
 \end{align*} 
 
 Using a closed-form or numerical optimization method, the decoding matrix can be found by minimizing the reconstruction error, $||\textbf{x} - \textbf{D}\textbf{D}^T\textbf{x}||_2^2$ across each point in the dataset.
  
-Often times $l$ is a parameter selected by the user. For visual purposes, $l$ is typically chosen as 2 such that the compressed data can be plotted on a Cartesian plane.
-
-\subsubsection{UMAP}
-UMAP is a novel technique by McInnes et al. 
+$l$ is typically the only parameter selected by the user. For visual purposes, $l$ is typically chosen as 2 such that the compressed data can be plotted on a Cartesian plane.
 
 \subsubsection{t-SNE}
+t-SNE was proposed by Van der Maaten et al. \cite{vanDerMaaten2008} as a technique for visualizing high-dimensional data. At a high-level, the algorithm maps each data point to a location on a 2D or 3D map that can reveal the structure at many scales. The resulting map effectively reveals low-dimensional manifolds on which the data points lie.
+
+t-SNE algorithms are incorporated into the \verb|scikit-learn| Python library. The algorithm is capable of optimizing a dimensionality reduction on a dataset based on a number of parameters selected by a user. Some of these include the number of dimensions and the perplexity, which dictate the manner in which the algorithm structures the lower-dimension manifolds in which the data lies.
+
+\subsubsection{UMAP}
+UMAP is a novel non-linear manifold learning technique by McInnes et al. \cite{mcinnes_umap_2020}. UMAP is a scalable algorithm that is comparable to t-SNE in visualization, but superior in runtime and preservation of global structure.
+
+UMAP algorithms have been abstracted into a Python library, \verb|umap-learn|, which is capable of optimizing a dimensionality reduction on a dataset based on a number of parameters selected by a user. Some of these include the number of dimensions, the number of neighbors and the minimum distance between points, which play roles in the generalization of the algorithm, the trends identified (local or global), and the distinction between clusters.
 
 \subsection{Implementation}
+Brief data pre-processing was done before implementing the different dimensionality reduction techniques. Commonly used libraries such as \verb|numpy| and \verb|matplotlib| were imported, before the data was loaded into a numpy array, stripped of its first row (instance headers) and its first column (feature headers) and transposed such that the data was in the form of a $n \times m$ matrix where $n$ is the number of instances and $m$ is the number of features.
 
-\subsection{Comparison of Dimensionality Reduction Techniques}
+The dimensionality reduction techniques were then implemented. The \verb|scikit-learn| library was used to implement PCA and t-SNE, while the \verb|umap-learn| library was used to implement UMAP. Specifically, the \verb|sklearn.decomposition.PCA|, \verb|umap|, and \verb|sklearn.manifold| classes were used for \href{https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html}{PCA}, \href{https://umap-learn.readthedocs.io/en/latest/parameters.html}{UMAP}, and \href{https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html}{t-SNE} respectively. Please refer to the linked documentation for more information on the class parameters and their default values.
+
+First, the techniques were implemented with their default parameters with the exception of the number of dimensions, which was set to 2 for all techniques. The results of this implementation are shown in Figure \ref{fig:default_dimred}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{Images/default_dimred.png}
+    \caption{Dimensionality reduction techniques with default parameters.}
+    \label{fig:default_dimred}
+\end{figure}
 
 \section{Part 2: Clustering}
 \subsection{Agglomerative Clustering}
@@ -97,6 +110,8 @@ UMAP is a novel technique by McInnes et al.
 \subsubsection{Adjusted Rand Index}
 
 \newpage
-\printbibliography
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 
 \end{document}
