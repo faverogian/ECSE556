@@ -9,8 +9,12 @@ venv/
 *.synctex.gz
 *.toc
 *.out
+*.blg
 
 # Exclude bibtex files
 *.bbl
 *.bcf
 *.xml
+
+# Exclude Jupyter Notebook files
+.ipynb_checkpoints/

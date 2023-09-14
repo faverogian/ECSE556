@@ -35,13 +35,11 @@
 \maketitle
 \newpage
 
-\tableofcontents
-\newpage
+% \tableofcontents
+% \newpage
 
 \section{Introduction}
-Transcriptomic data refers to a collection of RNA molecules, or transcripts, present in cell tissues at a reference time. Typically, these molecules are generated in a cell through the process of transcription of DNA into RNA. This data contains insights into the expression levels of genes in a cell which can be used to predict various items like disease, stimuli response, and development, among others.
-
-Analyzing transcriptomic data is a complex task due to the large number of genes present in a cell. However, successful analysis of this data can lead to important discoveries in gene function, networks, and pathways involved in biological processes. This is especially important in the field of network biology where the goal is to understand the structure and function of biological networks.
+Transcriptomic data refers to a collection of RNA molecules, or transcripts, present in cell tissues at a reference time. Typically, these molecules are generated in a cell through the process of transcription of DNA into RNA. This data contains insights into the expression levels of genes in a cell which can be used to predict various items like disease, stimuli response, and development, among others \cite{noauthor_transcriptome_nodate}.
 
 Several classical machine learning approaches can be used when analyzing transcriptomic data. These include dimensionality reduction, clustering, and regression. All three of these particular approaches will be explored in this assignment using popular Python libraries to gain some insight into the data provided. Gene expression data was provided alongside this assignment(\verb|gdsc_expr_postCB.csv|) and drug response data (\verb|gdsc_dr.csv|). The file contains rows that begin with a gene name and are taken to be features of the data, while columns represent gene lines, or instances. 
 
@@ -50,44 +48,29 @@ Dimensionality reduction is a technique used to reduce the number of features in
 
 Several dimensionality reduction techniques are explored in this assignment. These include Principal Component Analysis (PCA), UMAP, and t-SNE algorithms.
 
-\subsection{Principal Component Analysis}
-\subsubsection{Theory}
+\subsection{Theory}
+The following is adapted from Goodfellow et al. \cite{GoodBengCour16}.
 
-The following is adapted from Goodfellow et al \cite{GoodBengCour16}.
-
-PCA is a lossy compression technique that is used to reduce the dimensionality of a dataset. It is lossy because the original data is stored in a way that uses less memory, but loses some precision in the process. Ideally, the data is compressed in a way that preserves the most important information.
-
-For a set of \textit{m} data points $\textbf{x}^{(i)}$ $\in$ $\mathbb{R}^n$, PCA finds a lower dimensional representation of the data by representing it as a code vector $\textbf{c}^{(i)}$ $\in$ $\mathbb{R}^l$ where $l < n$. The goal of PCA is to find a function $f$ such that $\textbf{c}^{(i)}$ = $f(\textbf{x}^{(i)})$ and a decoding function $g$ which provides $x \approx g(f(x))$. This is simply done using a decoding matrix, $\textbf{D} \in \mathbb{R}^{n \times l}$ which has columns that are orthogonal and have a unit norm. Following this, the code vector is given by:
+\subsubsection{Principal Component Analysis}
+For a set of \textit{m} data points $\textbf{x}^{(i)}$ $\in$ $\mathbb{R}^n$, PCA finds a lower dimensional representation of the data by representing it as a code vector $\textbf{c}^{(i)}$ $\in$ $\mathbb{R}^l$ where $l < n$. The goal of PCA is to find a function $f$ such that $\textbf{c}^{(i)}$ = $f(\textbf{x}^{(i)})$ and a decoding function $g$ which provides $\textbf{x} \approx g(f(\textbf{x}))$. This is simply done using a decoding matrix, $\textbf{D} \in \mathbb{R}^{n \times l}$ which has columns that are orthogonal and have a unit norm. Following this, the code vector is given by:
 \begin{align*}
-        f(\textbf{x}) = \textbf{c} = \textbf{D}^T\textbf{x}
+        \textbf{c} = f(\textbf{x}) = \textbf{D}^T\textbf{x}
 \end{align*}
 and the reconstructed input is given by:
 \begin{align*}
-        g(\textbf{c}) = \textbf{x} = \textbf{D}\textbf{D}^T\textbf{x}
+        \textbf{x} \approx g(\textbf{c}) = \textbf{D}\textbf{D}^T\textbf{x}
 \end{align*} 
 
 Using a closed-form or numerical optimization method, the decoding matrix can be found by minimizing the reconstruction error, $||\textbf{x} - \textbf{D}\textbf{D}^T\textbf{x}||_2^2$ across each point in the dataset.
  
-Often times $l$ is a parameter selected by the user. For visual purposes, $l$ is typically chosen as 2 such that the compressed data can be plotted on a Cartesian plane.  
+Often times $l$ is a parameter selected by the user. For visual purposes, $l$ is typically chosen as 2 such that the compressed data can be plotted on a Cartesian plane.
 
-\subsubsection{Implementation}
-A PCA algorithm was implemented using the \verb|sklearn.decomposition.PCA| library in addition to peripheral libraries for data manipulation (\verb|numpy|) and visualization (\verb|matplotlib|).
+\subsubsection{UMAP}
+UMAP is a novel technique by McInnes et al. 
 
-\subsubsection{Results}
+\subsubsection{t-SNE}
 
-\subsection{UMAP}
-\subsubsection{Theory}
-
-\subsubsection{Implementation}
-
-\subsubsection{Results}
-
-\subsection{t-SNE}
-\subsubsection{Theory}
-
-\subsubsection{Implementation}
-
-\subsubsection{Results}
+\subsection{Implementation}
 
 \subsection{Comparison of Dimensionality Reduction Techniques}
 
