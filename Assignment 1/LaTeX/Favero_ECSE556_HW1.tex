@@ -33,8 +33,8 @@
 \maketitle
 \newpage
 
-% \tableofcontents
-% \newpage
+\tableofcontents
+\newpage
 
 \section{Introduction}
 Transcriptomic data refers to a collection of RNA molecules, or transcripts, present in cell tissues at a reference time. Typically, these molecules are generated in a cell through the process of transcription of DNA into RNA. This data contains insights into the expression levels of genes in a cell which can be used to predict various items like disease, stimuli response, and development, among others \cite{noauthor_transcriptome_nodate}.
@@ -87,9 +87,32 @@ First, the techniques were implemented with their default parameters with the ex
     \label{fig:default_dimred}
 \end{figure}
 
+\vspace{-0.5cm}
+
 A quick implementation with the default parameters of each technique gives some insight into the nature of the performance. As seen in Figure \ref{fig:default_dimred}, distinct regions of point clusters have been generated in both the UMAP and t-SNE plots. The PCA plot, however, does not show any distinct clusters and instead shows a large cloud of points with no discernible structure. Knowing that both UMAP and t-SNE are non-linear techniques, it can be deduced that perhaps linear methods, such as PCA, are not the most suitable dimensionality reduction approaches for this dataset.
 
-Another point to note is that while both UMAP and t-SNE have generated distinct clusters, the clusters are not identical in shape or density. UMAP has produced denser clusters that are closer to the origin, while t-SNE has produced a similar amount of clusters that are more spread out, both in terms of point-to-point and cluster-to-cluster. To examine the non-linear techniques further, parameters of interest were changed in isolation to analyze their effect on the resulting plots. 
+In addition to the visual inspection of the plots, the runtime of each technique was also recorded. The runtime of each technique is shown in Table \ref{tab:default_dimred}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Method} & \textbf{Runtime (s)} \\
+        \hline
+        PCA & 0.383  \\
+        \hline
+        UMAP & 5.850 \\
+        \hline
+        t-SNE & 3.916 \\
+        \hline
+    \end{tabular}
+    \caption{Runtime of each technique using default parameters.}
+    \label{tab:default_dimred}
+\end{table}
+
+\vspace{-0.5cm}
+
+A point to note is that while both UMAP and t-SNE have generated distinct clusters, the clusters are not identical in shape or density. UMAP has produced denser clusters that are closer to the origin, while t-SNE has produced a similar amount of clusters that are more spread out, both in terms of point-to-point and cluster-to-cluster. To examine the non-linear techniques further, parameters of interest were changed in isolation to analyze their effect on the resulting plots. 
 
 \subsubsection{UMAP Parameter Analysis}
 A sequence of reductions with varying number of neighbors in UMAP is observed in Figure \ref{fig:UMAP_vary}.
@@ -101,6 +124,8 @@ A sequence of reductions with varying number of neighbors in UMAP is observed in
     \label{fig:UMAP_vary}
 \end{figure}
 
+\vspace{-0.5cm}
+
 Visually, adjusting the number of neighbors considered in a UMAP reduction provides a different insight into the relationships between data points. As seen in Figure \ref{fig:UMAP_vary}, the number of clusters identified by the algorithm decreases as the number of neighbors increases. It can be discerned then, that considering more neighbors captures broader trends in the data, while considering fewer neighbors captures more local trends.
 
 A sequence of reductions with varying minimum distance in UMAP is observed in Figure \ref{fig:UMAP_vary2}.
@@ -111,6 +136,8 @@ A sequence of reductions with varying minimum distance in UMAP is observed in Fi
     \caption{UMAP reduction of the data varying the minimum distance.}
     \label{fig:UMAP_vary2}
 \end{figure}
+
+\vspace{-0.5cm}
 
 From inspection, the minimum distance parameter seems to have a spread effect on the clusters and data points. As the minimum distance increased, the clusters reduced in number and became more spread out. This is likely due to the fact that the minimum distance parameter is used to control the effective minimum distance between points. As the minimum distance increases, the algorithm is forced to spread out the clusters to meet the minimum distance requirement.
 
@@ -126,30 +153,39 @@ A sequence of reductions with varying perplexity in t-SNE is observed in Figure 
     \label{fig:TSNE_vary}
 \end{figure}
 
+\vspace{-0.5cm}
+
 Similar to the number of neighbors parameter in UMAP, the perplexity parameter in t-SNE controls the number of neighbors considered when reducing the dimensionality of the data. As seen in Figure \ref{fig:TSNE_vary}, the number of clusters identified by the algorithm decreases as the perplexity increases. It can be similarly discerned then that considering more neighbors captures broader trends in the data, while considering fewer neighbors captures more local trends.
 
 Again, depending on the objective of the dimensionality reduction, the perplexity parameter can be used to control the generalization of the algorithm. If the goal is to identify broad trends in the data, then a higher perplexity should be used. If the goal is to identify local trends in the data, then a lower perplexity should be used.
 
 \subsection{Discussion of Results}
 \begin{enumerate}
-    \item Do you see different clusters forming (visually)? How much correspondence exist
-    between clusters that you find in different methods?
+    \item \textbf{Do you see different clusters forming (visually)? How much correspondence exist between clusters that you find in different methods?}
+
+    Different clusters formed visually in the UMAP and t-SNE plots. The clusters in the UMAP plot were denser and closer to the origin, while the clusters in the t-SNE plot were more spread out. The clusters in the PCA plot were not visually discernible.  
+
+    Varying the parameters of both the UMAP and t-SNE algorithms resulted in different clusters being formed. The number of clusters identified by the algorithms decreased as the number of neighbors or perplexity increased. This is due to the fact that considering more neighbors or a higher perplexity captures broader trends in the data, while considering fewer neighbors or a lower perplexity captures more local trends. Therefore, the non-linear techniques are surely capable of producing high correspondence, but the parameters must be tuned to achieve this correspondence. However, neither UMAP nor t-SNE had correspondence with the PCA plot.
+
+    \item \textbf{What is the difference between the three methods above? Use pros/cons to compare them against each other.}
+    
+    PCA is a linear dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the maximum amount of variance. PCA is a fast algorithm (was the fastest of the three), however, PCA is not capable of capturing non-linear relationships in the data and is therefore not suitable for datasets with non-linear relationships. In addition, PCA relies on lossy compression, meaning that the original data cannot be fully recovered from the compressed data.
+
+    UMAP is a non-linear, highly customizable, dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the global structure of the data. In this implementation, UMAP was the slowest of the three algorithms as a result of its high degree of complexity. However, UMAP was best suited for this dataset as it was able to capture the non-linear relationships in the data and produce dense clusters from the data capturing both local and global trends.
+
+    t-SNE is another non-linear dimensionality reduction technique that was capable of forming clusters with this data. t-SNE was faster than UMAP, but could not generate clusters as dense as UMAP on a 2D plot. However, like UMAP, t-SNE is tunable and can be used to capture local trends in the  highly effectively.
 \end{enumerate}
 
 \section{Part 2: Clustering}
-\subsection{Agglomerative Clustering}
-\subsubsection{Theory}
+\subsection{Theory}
+\subsubsection{Agglomerative Clustering}
 
-\subsubsection{Implementations}
+\subsubsection{K-Means Clustering}
 
-\subsubsection{Results}
+\subsection{Implementations}
+\subsubsection{Agglomerative Clustering}
 
-\subsection{K-Means Clustering}
-\subsubsection{Theory}
-
-\subsubsection{Implementation}
-
-\subsubsection{Results}
+\subsubsection{K-Means Clustering}
 
 \subsection{Comparison of Clustering Techniques}
 \subsubsection{Jaccard Similarity}
