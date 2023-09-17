@@ -1,0 +1,8 @@
+# Dimensionality reduction
+done
+
+# Clustering
+Run experiments 5 times and take averages
+
+# Regression
+start

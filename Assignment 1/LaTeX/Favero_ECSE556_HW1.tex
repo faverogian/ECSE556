@@ -15,6 +15,7 @@
 \usepackage[margin=3cm]{geometry}
 \usepackage{subfig}
 \usepackage[numbers]{natbib}
+\usepackage{diagbox}
 
 \hypersetup{
         hidelinks
@@ -179,20 +180,99 @@ Again, depending on the objective of the dimensionality reduction, the perplexit
 \section{Part 2: Clustering}
 \subsection{Theory}
 \subsubsection{Agglomerative Clustering}
+Agglomerative clustering is a clustering approach that works by first partitioning a dataset into singleton clusters, and then iteratively merging the clusters together until there is only one cluster remaining \cite{mullner_modern_2011}. There are several parameters that govern the algorithm: linkage, distance metric, and, obviously, the number of clusters. Linkage refers to the method used to calculate the distance between clusters, while the distance metric refers to the method used to calculate the distance between points. 
 
 \subsubsection{K-Means Clustering}
+K-means clustering is a traditional unsupervised algorithm used to partition a dataset into $k$ clusters. The algorithm works by first initializing $k$ centroids, and then iteratively assigning each point to the cluster with the closest centroid, and then updating the centroids based on the new cluster assignments until a steady state is reached. The algorithm is sensitive to the initial centroid positions, and therefore, the algorithm is typically run multiple times with different initialization to ensure that the global minimum is reached.
 
-\subsection{Implementations}
-\subsubsection{Agglomerative Clustering}
+\subsection{Implementation}
+The \verb|sk.learn.cluster.AgglomerativeClustering| function was used to implement agglomerative clustering. Initially, the function was used with its default parameters with the exception of the number of clusters, which was set to 3. 
 
-\subsubsection{K-Means Clustering}
+The \verb|sklearn.cluster.KMeans| function was used to implement K-means clustering with a specification of 3 clusters. Given that the initial clusters are assigned randomly, the following results are based on an individual run of the algorithm and are therefore are not fully reproducible without setting a random seed.
 
-\subsection{Comparison of Clustering Techniques}
-\subsubsection{Jaccard Similarity}
+\subsubsection{Jaccard Similarity with Default Parameters}
+The computed clusters of each algorithm were compared using the Jaccard similarity metric implemented via the \verb|sklearn.metrics.jaccard_score| function. An iterative approach was conducted to compute the similarity of the nine permutations of the three algorithms. The results of this approach are shown in Table \ref{tab:jaccard_default}. Note that the rows represent the clusters computed by the agglomerative algorithm, while the columns represent the clusters computed by the K-means clustering algorithm.
 
-\subsubsection{Rand Index}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline 
+        \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
+        \hline
+        \textbf{Cluster 1} & 0.892 & 0.000 & 0.044 \\
+        \hline
+        \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
+        \hline
+        \textbf{Cluster 3} & 0.022 & 0.000 & 0.864 \\
+        \hline
+    \end{tabular}
+    \caption{Jaccard similarity of the clusters using default parameters.}
+    \label{tab:jaccard_default}
+\end{table}
 
-\subsubsection{Adjusted Rand Index}
+\vspace{-0.5cm}
+
+The Jaccard similarity metric is a measure of the similarity between two sets. The metric is defined as the size of the intersection of the sets divided by the size of the union of the sets. In this case, the sets are the clusters identified by the algorithms. The Jaccard similarity metric is a value between 0 and 1, where 0 indicates no similarity and 1 indicates perfect similarity.
+
+From Table \ref{tab:jaccard_default}, it can be seen that the clusters identified by the algorithms are not identical, however there is a high degree of similarity. Note that the values were rounded to 3 decimal places for readability. 
+
+\subsubsection{Rand Index with Default Parameters}
+The computed clusters of each algorithm were compared using the Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the Rand-index of the two algorithms at default parameters was approximately \textbf{0.918}.
+
+\subsubsection{Adjusted Rand Index with Default Parameters}
+The computed clusters of each algorithm were compared using the adjusted Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the adjusted Rand-index of the two algorithms at default parameters was approximately \textbf{0.825}.
+
+\subsection{Analysis of Agglomerative Clustering}
+Agglomerative clustering was implemented separately with average linkage and Euclidean and cosine distance metrics. A Jaccard similarity analysis of this implementation are shown in Table \ref{tab:average_agglo}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline 
+        \diagbox{Euclidean}{Cosine} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
+        \hline
+        \textbf{Cluster 1} & 1.000 & 0.000 & 0.000 \\
+        \hline
+        \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
+        \hline
+        \textbf{Cluster 3} & 0.000 & 0.000 & 1.000 \\
+        \hline
+    \end{tabular}
+    \caption{Jaccard similarity of the clusters using average linkage and Euclidean and cosine distance.}
+    \label{tab:average_agglo}
+\end{table}
+
+\vspace{-0.5cm}
+
+Interestingly, the clusters produced by the average linkage algorithm are identical regardless of the distance metric used. The clusters found via Euclidean distance are identical to the clusters found via cosine distance. A hypothesis for this is that the average linkage algorithm inferred on this dataset is not sensitive to the distance metric used. Correspondingly, the Rand-Index and adjusted Rand-Index were found to be \textbf{1.0}. Therefore, it can be concluded that the clusters produced by the average linkage algorithm are identical regardless of the distance metric used.
+
+
+A further analysis was conducted to examine the similarity between the clusters produced by the average linkage algorithm and the K-means algorithm. The results of this analysis are shown in Table \ref{tab:agglo_euc}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline 
+        \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
+        \hline
+        \textbf{Cluster 1} & 0.475 & 0.002 & 0.000 \\
+        \hline
+        \textbf{Cluster 2} & 0.174 & 0.000 & 0.000 \\
+        \hline
+        \textbf{Cluster 3} & 0.349 & 0.000 & 0.017 \\
+        \hline
+    \end{tabular}
+    \caption{Jaccard similarity of the clusters using average linkage and K-means.}
+    \label{tab:agglo_euc}
+\end{table}
+
+\vspace{-0.5cm}
+
+In addition to the Jaccard similarity metric, the Rand index and adjusted Rand index were also computed. The Rand index was approximately \textbf{0.382}, while the adjusted Rand index was approximately \textbf{0.0}.
+
+Average linkage clustering with Euclidean and cosine distance metrics produced clusters that were not similar to the clusters produced by the K-means algorithm. This is likely due to the fact that the average linkage algorithm is sensitive to outliers, and therefore, the clusters produced by the algorithm are not as dense as the clusters produced by the K-means algorithm. 
+
+\section{Regression}
 
 \newpage
 
