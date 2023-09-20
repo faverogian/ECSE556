@@ -101,9 +101,7 @@ In addition to the visual inspection of the plots, the runtime of each technique
         \textbf{Method} & \textbf{Runtime (s)} \\
         \hline
         PCA & 0.383  \\
-        \hline
         UMAP & 5.850 \\
-        \hline
         t-SNE & 3.916 \\
         \hline
     \end{tabular}
@@ -183,10 +181,10 @@ Again, depending on the objective of the dimensionality reduction, the perplexit
 Agglomerative clustering is a clustering approach that works by first partitioning a dataset into singleton clusters, and then iteratively merging the clusters together until there is only one cluster remaining \cite{mullner_modern_2011}. There are several parameters that govern the algorithm: linkage, distance metric, and, obviously, the number of clusters. Linkage refers to the method used to calculate the distance between clusters, while the distance metric refers to the method used to calculate the distance between points. 
 
 \subsubsection{K-Means Clustering}
-K-means clustering is a traditional unsupervised algorithm used to partition a dataset into $k$ clusters. The algorithm works by first initializing $k$ centroids, and then iteratively assigning each point to the cluster with the closest centroid, and then updating the centroids based on the new cluster assignments until a steady state is reached. The algorithm is sensitive to the initial centroid positions, and therefore, the algorithm is typically run multiple times with different initialization to ensure that the global minimum is reached.
+K-means clustering is a traditional unsupervised algorithm used to partition a dataset into $k$ clusters. The algorithm works by first initializing $k$ centroids, iteratively assigning each point to the cluster with the closest centroid, and then updating the centroids based on the new cluster assignments until a steady state is reached. The algorithm is sensitive to the initial centroid positions, and therefore, the algorithm is typically run multiple times with different initialization to ensure that the global minimum is reached.
 
 \subsection{Implementation}
-The \verb|sk.learn.cluster.AgglomerativeClustering| function was used to implement agglomerative clustering. Initially, the function was used with its default parameters with the exception of the number of clusters, which was set to 3. 
+The \verb|sk.learn.cluster.AgglomerativeClustering| function was used to implement agglomerative clustering. Initially, the function was used with its default parameters with the exception of the number of clusters, which was set to 3. With its default settings, the agglomerative clustering algorithm uses a ``ward'' linkage, which minimized the variance of clusters being merged, and Euclidean affinity.
 
 The \verb|sklearn.cluster.KMeans| function was used to implement K-means clustering with a specification of 3 clusters. Given that the initial clusters are assigned randomly, the following results are based on an individual run of the algorithm and are therefore are not fully reproducible without setting a random seed.
 
@@ -200,9 +198,7 @@ The computed clusters of each algorithm were compared using the Jaccard similari
         \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
         \hline
         \textbf{Cluster 1} & 0.892 & 0.000 & 0.044 \\
-        \hline
         \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
-        \hline
         \textbf{Cluster 3} & 0.022 & 0.000 & 0.864 \\
         \hline
     \end{tabular}
@@ -212,15 +208,15 @@ The computed clusters of each algorithm were compared using the Jaccard similari
 
 \vspace{-0.5cm}
 
-The Jaccard similarity metric is a measure of the similarity between two sets. The metric is defined as the size of the intersection of the sets divided by the size of the union of the sets. In this case, the sets are the clusters identified by the algorithms. The Jaccard similarity metric is a value between 0 and 1, where 0 indicates no similarity and 1 indicates perfect similarity.
-
-From Table \ref{tab:jaccard_default}, it can be seen that the clusters identified by the algorithms are not identical, however there is a high degree of similarity. Note that the values were rounded to 3 decimal places for readability. 
+The Jaccard similarity metric is a measure of the similarity between two sets. The metric is defined as the size of the intersection of the sets divided by the size of the union of the sets. In this case, the sets are the clusters identified by the algorithms. The Jaccard similarity metric is a value between 0 and 1, where 0 indicates no similarity and 1 indicates perfect similarity. From Table \ref{tab:jaccard_default}, it can be seen that the clusters identified by the algorithms are not identical, however there is a high degree of similarity. Note that the values were rounded to 3 decimal places for readability. 
 
 \subsubsection{Rand Index with Default Parameters}
-The computed clusters of each algorithm were compared using the Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the Rand-index of the two algorithms at default parameters was approximately \textbf{0.918}.
+The computed clusters of each algorithm were compared using the Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the Rand-index of the two algorithms at default parameters was approximately \textbf{0.918}, on a scale from 0 to 1, with 1 indicating perfect correspondence.
 
 \subsubsection{Adjusted Rand Index with Default Parameters}
-The computed clusters of each algorithm were compared using the adjusted Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the adjusted Rand-index of the two algorithms at default parameters was approximately \textbf{0.825}.
+The computed clusters of each algorithm were compared using the adjusted Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the adjusted Rand-index of the two algorithms at default parameters was approximately \textbf{0.825}, on a scale from -1 to 1, with -1 indicating disagreement, 0 indicating randomness, and 1 indicating a perfect correspondence.
+
+Clearly, both indexes suggest that the clusters identified by the algorithms are not identical, however there is a high degree of similarity.
 
 \subsection{Analysis of Agglomerative Clustering}
 Agglomerative clustering was implemented separately with average linkage and Euclidean and cosine distance metrics. A Jaccard similarity analysis of this implementation are shown in Table \ref{tab:average_agglo}.
@@ -232,9 +228,7 @@ Agglomerative clustering was implemented separately with average linkage and Euc
         \diagbox{Euclidean}{Cosine} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
         \hline
         \textbf{Cluster 1} & 1.000 & 0.000 & 0.000 \\
-        \hline
         \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
-        \hline
         \textbf{Cluster 3} & 0.000 & 0.000 & 1.000 \\
         \hline
     \end{tabular}
@@ -244,8 +238,7 @@ Agglomerative clustering was implemented separately with average linkage and Euc
 
 \vspace{-0.5cm}
 
-Interestingly, the clusters produced by the average linkage algorithm are identical regardless of the distance metric used. The clusters found via Euclidean distance are identical to the clusters found via cosine distance. A hypothesis for this is that the average linkage algorithm inferred on this dataset is not sensitive to the distance metric used. Correspondingly, the Rand-Index and adjusted Rand-Index were found to be \textbf{1.0}. Therefore, it can be concluded that the clusters produced by the average linkage algorithm are identical regardless of the distance metric used.
-
+Interestingly, the clusters produced by the average linkage algorithm are identical regardless of the distance metric used. Correspondingly, the Rand-Index and adjusted Rand-Index were found to be \textbf{1.0}. Therefore, it can be concluded that the clusters produced by the average linkage algorithm are identical regardless of the distance metric used for this dataset.
 
 A further analysis was conducted to examine the similarity between the clusters produced by the average linkage algorithm and the K-means algorithm. The results of this analysis are shown in Table \ref{tab:agglo_euc}.
 
@@ -256,9 +249,7 @@ A further analysis was conducted to examine the similarity between the clusters 
         \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
         \hline
         \textbf{Cluster 1} & 0.475 & 0.002 & 0.000 \\
-        \hline
         \textbf{Cluster 2} & 0.174 & 0.000 & 0.000 \\
-        \hline
         \textbf{Cluster 3} & 0.349 & 0.000 & 0.017 \\
         \hline
     \end{tabular}
@@ -270,9 +261,95 @@ A further analysis was conducted to examine the similarity between the clusters 
 
 In addition to the Jaccard similarity metric, the Rand index and adjusted Rand index were also computed. The Rand index was approximately \textbf{0.382}, while the adjusted Rand index was approximately \textbf{0.0}.
 
-Average linkage clustering with Euclidean and cosine distance metrics produced clusters that were not similar to the clusters produced by the K-means algorithm. This is likely due to the fact that the average linkage algorithm is sensitive to outliers, and therefore, the clusters produced by the algorithm are not as dense as the clusters produced by the K-means algorithm. 
+Average linkage clustering with Euclidean and cosine distance metrics produced clusters that were not similar to the clusters produced by the K-means algorithm. In retrospect, this aligns well with expectation. Both ward linkage and K-means techniques aim to minimize cluster variance and create clusters that are of roughly equal shape and size. Average linkage techniques, on the other hand, take into account the mean distance between all points in neighboring clusters. As a result, clusters formed can be of abnormal shapes and sizes. 
+
+\subsubsection{Analysis of Agglomerative Clustering on Subsets of the Data}
+The agglomerative clustering algorithm was implemented on subsets of the data to observe why both Euclidean and cosine distance metrics produced identical clusters. 
+
+First, subsets of the data were created by only including randomly selected features from the data. The agglomerative clustering algorithm was then implemented on the subsets of the data using Euclidean and cosine distance metrics. The results of this analysis are shown in Table \ref{tab:agglo_euc_sub}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline 
+        \textbf{Number of Features} & \textbf{Rand Score} & \textbf{Adjusted Rand Score} \\
+        \hline
+        25 & 0.996 & 0.831 \\
+        100 & 0.996 & 0.855 \\
+        200 & 0.998 & 0.922 \\
+        300 & 1.0 & 1.0 \\
+        \hline
+    \end{tabular}
+    \caption{Similarity of the clusters using average linkage and Euclidean and cosine distance on feature subsets of the data.}
+    \label{tab:agglo_euc_sub}
+\end{table}
+
+\vspace{-0.5cm}
+
+Next, subsets of the data were created by only including randomly selected samples from the data. The agglomerative clustering algorithm was then implemented on the subsets of the data using Euclidean and cosine distance metrics. The results of this analysis are shown in Table \ref{tab:agglo_euc_sub2}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|} 
+        \hline
+        \textbf{Number of Samples} & \textbf{Rand Score} & \textbf{Adjusted Rand Score} \\
+        \hline
+        25 & 1.0 & 1.0 \\
+        100 & 1.0 & 1.0 \\
+        200 & 1.0 & 1.0 \\
+        300 & 1.0 & 1.0 \\
+        \hline
+    \end{tabular}
+    \caption{Similarity of the clusters using average linkage and Euclidean and cosine distance on sample subsets of the data.}
+    \label{tab:agglo_euc_sub2}
+\end{table}
+
+\vspace{-0.5cm}
+
+From these observations a more clear understanding of the gene expression data can be conveyed. Here, it is seen that removing samples does not result in the two distance metrics producing different clusters. However, removing features does. This could be related to the dimensionality reduction analysis done prior. 
+
+Both UMAP and t-SNE reduction showed that tight clusters form in the data at lower dimensions. This sense of structure causes Euclidean and cosine distance metrics to perform similarly - it is not until the structure itself is modified that these two distance metrics will disagree with each other. In this case, removing samples does not seem to change the structure of the data enough to note any differences. However, removing features (until there are only approx. 300) changes the dimensionality and structure of the data enough to highlight the difference in these two clustering methods. The clusters produced by the two distance metrics are still very similar, but not identical.
 
 \section{Regression}
+
+\subsection{Regularization Analysis}
+
+\subsection{Nested Cross-Validation}
+Nested cross-validation is a technique used for robustly evaluating the performance of machine learning models while simultaneously optimizing the hyperparameters associated with the models. 
+
+Initially, inner and outer loop cross-validation (CV) folds are established employing stratification to ensure balanced representation. In this case, it was specified that the outer loop was to have 4 folds, while the inner loop was to have 3. Subsequently, a parameter grid is defined to be iterated over during hyperparameter optimization, which occurs in the inner loop of the CV process. In this case, the hyperparameter alpha was tested at values [0.01, 0.1, 0.3, 0.5, 0.9].
+
+In the outer loop, the data is partitioned into 4 distinct training (+ validation) (75\% of the data) and test sets (25\% of the data). Within each outer fold, the training data is partitioned again into 3 folds of training (66\%) and validation sets (33\%). The inner loop is used to compare the performance of each model at the specified hyperparameter values. In this case, it was known that the LASSO estimator was to be used, and therefore the inner loop was used to compare the performance using MSE. The alpha value that resulted in the lowest MSE on the validation set was then selected as the optimal hyperparameter value for the given outer fold. The model was then re-fit on the entire outer fold training set and evaluated on the unseen outer fold test set using MSE and Spearman Rank Correlation. This process was repeated for each outer fold, resulting in 4 MSE and Spearman Rank Correlation values. The average of these values was then taken as the final performance metric for the model.
+
+\subsection{Implementation}
+The procedure outlined above was implemented in Python using Scikit-learn. 
+
+The \verb|sklearn.model_selection.KFold| method was used to define the outer and inner loops desired. First, the feature data was split via the outer loop object and then loop was constructed iterate over each outer fold. Within each fold, the data was partitioned into its train and test subsets. 
+
+The \verb|sklearn.model_selection.GridSearchCV| object parameterized by a LASSO estimator, the parameter grid, and the inner loop folds was then used to perform the inner loop CV process. The grid search object automatically optimizes the hyperparameters of the estimator based on the inner loop CV process, refits the model on the entire outer fold training set, and then can return various metrics such as the optimal hyperparameter value and the best estimator. The best estimator was then used to predict the test set of the outer fold, and the MSE and Spearman Rank Correlation were computed. This process was repeated for each outer fold, and the average MSE and Spearman Rank Correlation were computed. Note that the Spearman Rank Correlation was computed using the \verb|scipy.stats.spearmanr| function.
+
+\subsection{Results}
+The results of the nested cross-validation process at each outer loop fold are shown in Table \ref{tab:regression_results}.
+
+\begin{center}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    Alpha & Mean Squared Error & Spearman Correlation & p-value \\
+    \hline
+    0.1 & 2.308 & 0.323 & $1.1 \times 10^{-6}$ \\
+    0.1 & 2.258 & 0.341 & $2.0 \times 10^{-7}$ \\
+    0.1 & 2.93 & 0.317 & $1.8 \times 10^{-6}$ \\
+    0.1 & 2.306 & 0.344 & $2.0 \times 10^{-7}$ \\
+    \hline
+    \end{tabular}
+    \label{tab:regression_results}
+\end{center}
+
+The Spearman Rank Correlation at each outer loop fold was found to be statistically significant at a significance level of less than 0.05. Thus, the average MSE and Spearman Rank Correlation of a LASSO regression model were found to be \textbf{2.451} and \textbf{0.331} respectively.
+
+Each inner loop CV observed that the optimal alpha value was 0.1. Given the consistency, it seems that the optimal alpha value is not sensitive to the folds in the training data. 
+
+\subsection{Comparison to Baseline}
 
 \newpage
 
