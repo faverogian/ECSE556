@@ -313,6 +313,44 @@ Both UMAP and t-SNE reduction showed that tight clusters form in the data at low
 \section{Regression}
 
 \subsection{Regularization Analysis}
+In this section, target data was introduced to the dataset in the form of drug response data. The drug response vector was aligned with the gene expression data, with all instances being aligned with the same drug response value, and instances with no drug response data being removed. The feature data was then normalized using the \verb|sklearn.preprocessing.StandardScaler| function for faster convergence of the regression model.
+
+A LASSO regression model, which is a linear model with L1 regularization, was then fit to the data using the \verb|sklearn.linear_model.Lasso| function. The model was fit using a range of alpha values in [0.01, 0.1, 0.3, 0.5, 0.9], where the optimal weight vector is given by:
+\begin{align*}
+    w^* = \min_w \frac{1}{2n_samples}||Xw-y||_2^2 + \alpha||w||_1
+\end{align*}
+
+An analysis was done to examine how the value of alpha affects the number of features selected by the LASSO regression model. This was implemented by iterating over the alpha values and recording the number of non-zero coefficients in the weight vector. The results of this analysis are shown in Figure \ref{fig:lasso_alpha}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Images/regularization.png}
+    \caption{Number of non-zero coefficients in the weight vector as a function of alpha.}
+    \label{fig:lasso_alpha}
+\end{figure}
+
+The results are also shown in Table \ref{tab:lasso_alpha}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline 
+        \textbf{Alpha} & \textbf{Number of Non-Zero Coefficients} \\
+        \hline
+        0.01 & 760 \\
+        0.1 & 131 \\
+        0.3 & 7 \\
+        0.5 & 0 \\
+        0.9 & 0 \\
+        \hline
+    \end{tabular}
+    \caption{Number of non-zero coefficients in the weight vector as a function of alpha.}
+    \label{tab:lasso_alpha}
+\end{table}
+
+\vspace{-0.5cm}
+
+As alpha increases, the sparsity of the solution increases dramatically. This is conventional with theory, as more weight is given to the L1 norm penalty and thus the optimal solution will be more sparse. With this dataset, it is seen that an alpha value of 0.5 results in a weight vector with no non-zero coefficients. 
 
 \subsection{Nested Cross-Validation}
 Nested cross-validation is a technique used for robustly evaluating the performance of machine learning models while simultaneously optimizing the hyperparameters associated with the models. 
@@ -331,25 +369,48 @@ The \verb|sklearn.model_selection.GridSearchCV| object parameterized by a LASSO 
 \subsection{Results}
 The results of the nested cross-validation process at each outer loop fold are shown in Table \ref{tab:regression_results}.
 
-\begin{center}
+\begin{table}[H]
+    \centering
     \begin{tabular}{|c|c|c|c|}
-    \hline
-    Alpha & Mean Squared Error & Spearman Correlation & p-value \\
-    \hline
-    0.1 & 2.308 & 0.323 & $1.1 \times 10^{-6}$ \\
-    0.1 & 2.258 & 0.341 & $2.0 \times 10^{-7}$ \\
-    0.1 & 2.93 & 0.317 & $1.8 \times 10^{-6}$ \\
-    0.1 & 2.306 & 0.344 & $2.0 \times 10^{-7}$ \\
-    \hline
+        \hline
+        Alpha & Mean Squared Error & Spearman Correlation & p-value \\
+        \hline
+        0.1 & 2.308 & 0.323 & $1.1 \times 10^{-6}$ \\
+        0.1 & 2.258 & 0.341 & $2.0 \times 10^{-7}$ \\
+        0.1 & 2.93 & 0.317 & $1.8 \times 10^{-6}$ \\
+        0.1 & 2.306 & 0.344 & $2.0 \times 10^{-7}$ \\
+        \hline
     \end{tabular}
+    \caption{Results of the nested cross-validation process.}
     \label{tab:regression_results}
-\end{center}
+\end{table}
 
 The Spearman Rank Correlation at each outer loop fold was found to be statistically significant at a significance level of less than 0.05. Thus, the average MSE and Spearman Rank Correlation of a LASSO regression model were found to be \textbf{2.451} and \textbf{0.331} respectively.
 
 Each inner loop CV observed that the optimal alpha value was 0.1. Given the consistency, it seems that the optimal alpha value is not sensitive to the folds in the training data. 
 
 \subsection{Comparison to Baseline}
+To further evaluate the LASSO regression model, its performance in MSE was compared to some basic baseline models - a mean estimator and a median estimator. The mean estimator simply predicts the mean of the training data for all test instances, while the median estimator simply predicts the median of the training data for all test instances. The dummy models were evaluated using the same outer loop CV process as the LASSO regression model, and the average MSE was computed. Note that no Spearman Rank Correlation was computed for the dummy models as they predict a constant value for all test instances.
+
+The results of this comparison are shown in Table \ref{tab:regression_baseline}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Dummy Model & MSE & Spearman Rank Correlation \\
+        \hline
+        Mean & 2.780 & NaN \\
+        Median & 2.798 & NaN \\
+        \hline
+    \end{tabular}
+    \caption{Results of the dummy models.}
+    \label{tab:regression_baseline}
+\end{table}
+
+\vspace{-0.5cm}
+
+The LASSO regression model was found to outperform both the mean and median dummy models in MSE and Spearman Rank Correlation. 
 
 \newpage
 

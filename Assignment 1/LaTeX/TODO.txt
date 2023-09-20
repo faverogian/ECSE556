@@ -1,8 +1,5 @@
-# Dimensionality reduction
-done
+# Conclusion (?)
 
-# Clustering
-Run experiments 5 times and take averages
+# Verify results with other people
 
-# Regression
-start
+# Cut down on pages
