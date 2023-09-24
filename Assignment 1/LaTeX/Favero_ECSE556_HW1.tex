@@ -1,4 +1,5 @@
 \documentclass[12pt]{article}
+\usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{parskip}
@@ -40,13 +41,14 @@
 \section{Introduction}
 Transcriptomic data refers to a collection of RNA molecules, or transcripts, present in cell tissues at a reference time. Typically, these molecules are generated in a cell through the process of transcription of DNA into RNA. This data contains insights into the expression levels of genes in a cell which can be used to predict various items like disease, stimuli response, and development, among others \cite{noauthor_transcriptome_nodate}.
 
-Several classical machine learning approaches can be used when analyzing transcriptomic data. These include dimensionality reduction, clustering, and regression. All three of these particular approaches will be explored in this assignment using popular Python libraries to gain some insight into the data provided. Gene expression data was provided alongside this assignment(\verb|gdsc_expr_postCB.csv|) and drug response data (\verb|gdsc_dr.csv|). The file contains rows that begin with a gene name and are taken to be features of the data, while columns represent gene lines, or instances. 
+Several classical machine learning approaches can be used when analyzing transcriptomic data. These include dimensionality reduction, clustering, and regression. All three of these particular approaches will be explored in this assignment using popular Python libraries to gain some insight into the data provided. Gene expression data was provided alongside this assignment(\verb|gdsc_expr_postCB.csv|) and drug response data (\verb|gdsc_dr.csv|).
 
 \section{Part 1: Dimensionality Reduction}
 Dimensionality reduction is a technique used to reduce the number of features in a dataset. This is done by projecting the data onto a lower dimensional space and finding a new, simpler set of features that can be used to represent the original data. Memory usage, computational efficiency, and visualization are all advantages of dimensionality reduction.
 
 Several dimensionality reduction techniques are explored in this assignment. These include Principal Component Analysis (PCA), UMAP, and t-SNE algorithms.
 
+\begin{comment}
 \subsection{Theory}
 \subsubsection{Principal Component Analysis}
 The following is adapted from Goodfellow et al. \cite{GoodBengCour16}.
@@ -73,6 +75,7 @@ t-SNE algorithms are incorporated into the \verb|scikit-learn| Python library. T
 UMAP is a novel non-linear manifold learning technique by McInnes et al. \cite{mcinnes_umap_2020}. UMAP is a scalable algorithm that is comparable to t-SNE in visualization, but superior in runtime and preservation of global structure.
 
 UMAP algorithms have been abstracted into a Python library, \verb|umap-learn|, which is capable of optimizing a dimensionality reduction on a dataset based on a number of parameters selected by a user. Some of these include the number of dimensions, the number of neighbors and the minimum distance between points, which play roles in the generalization of the algorithm, the trends identified (local or global), and the distinction between clusters.
+\end{comment}
 
 \subsection{Implementation}
 Brief data pre-processing was done before implementing the different dimensionality reduction techniques. Commonly used libraries such as \verb|numpy| and \verb|matplotlib| were imported, before the data was loaded into a numpy array, stripped of its first row (instance headers) and its first column (feature headers) and transposed such that the data was in the form of a $n \times m$ matrix where $n$ is the number of instances and $m$ is the number of features.
@@ -92,7 +95,7 @@ First, the techniques were implemented with their default parameters with the ex
 
 A quick implementation with the default parameters of each technique gives some insight into the nature of the performance. As seen in Figure \ref{fig:default_dimred}, distinct regions of point clusters have been generated in both the UMAP and t-SNE plots. The PCA plot, however, does not show any distinct clusters and instead shows a large cloud of points with no discernible structure. Knowing that both UMAP and t-SNE are non-linear techniques, it can be deduced that perhaps linear methods, such as PCA, are not the most suitable dimensionality reduction approaches for this dataset.
 
-In addition to the visual inspection of the plots, the runtime of each technique was also recorded. The runtime of each technique is shown in Table \ref{tab:default_dimred}.
+In addition to the visual inspection of the plots, the runtime of each technique was also recorded when run on a machine with an Intel i7-8750H processor and 16 GB of RAM. The runtime of each technique is shown in Table \ref{tab:default_dimred}.
 
 \begin{table}[H]
     \centering
@@ -168,20 +171,23 @@ Again, depending on the objective of the dimensionality reduction, the perplexit
 
     \item \textbf{What is the difference between the three methods above? Use pros/cons to compare them against each other.}
     
-    PCA is a linear dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the maximum amount of variance. PCA is a fast algorithm (was the fastest of the three), however, PCA is not capable of capturing non-linear relationships in the data and is therefore not suitable for datasets with non-linear relationships. In addition, PCA relies on lossy compression, meaning that the original data cannot be fully recovered from the compressed data.
+    PCA is a fast algorithm (was the fastest of the three), is computationally efficient, scaled well with this large dataset, and is highly interpretable. However, PCA assumes that linear relationships are present in the data, and is therefore not suitable for datasets with non-linear relationships. In these cases, a loss of local structure can occur. It appears that the linear assumption did not hold particularly well with this dataset, as the PCA plot did not show any discernible preserved structure.
 
-    UMAP is a non-linear, highly customizable, dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the global structure of the data. In this implementation, UMAP was the slowest of the three algorithms as a result of its high degree of complexity. However, UMAP was best suited for this dataset as it was able to capture the non-linear relationships in the data and produce dense clusters from the data capturing both local and global trends.
+    UMAP is a non-linear, highly customizable, dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the local and global structure of the data. In this implementation, UMAP was the slowest of the three algorithms as a result of its high degree of complexity. However, it was best suited for this dataset as it was able to capture the non-linear relationships in the data and produce dense clusters from the data capturing both local and global trends.
 
-    t-SNE is another non-linear dimensionality reduction technique that was capable of forming clusters with this data. t-SNE was faster than UMAP, but could not generate clusters as dense as UMAP on a 2D plot. However, like UMAP, t-SNE is tunable and can be used to capture local trends in the  highly effectively.
+    t-SNE is another non-linear dimensionality reduction technique that was effective in identifying relationships in the gene expression data. Like UMAP, it appeared to be effective in preserving local structures in the data. Further, t-SNE was faster than UMAP, but could not generate clusters as dense on a 2D plot. However, like UMAP, t-SNE is tunable and can be used to capture local trends in the data effectively. 
 \end{enumerate}
 
 \section{Part 2: Clustering}
+
+\begin{comment}
 \subsection{Theory}
 \subsubsection{Agglomerative Clustering}
 Agglomerative clustering is a clustering approach that works by first partitioning a dataset into singleton clusters, and then iteratively merging the clusters together until there is only one cluster remaining \cite{mullner_modern_2011}. There are several parameters that govern the algorithm: linkage, distance metric, and, obviously, the number of clusters. Linkage refers to the method used to calculate the distance between clusters, while the distance metric refers to the method used to calculate the distance between points. 
 
 \subsubsection{K-Means Clustering}
 K-means clustering is a traditional unsupervised algorithm used to partition a dataset into $k$ clusters. The algorithm works by first initializing $k$ centroids, iteratively assigning each point to the cluster with the closest centroid, and then updating the centroids based on the new cluster assignments until a steady state is reached. The algorithm is sensitive to the initial centroid positions, and therefore, the algorithm is typically run multiple times with different initialization to ensure that the global minimum is reached.
+\end{comment}
 
 \subsection{Implementation}
 The \verb|sk.learn.cluster.AgglomerativeClustering| function was used to implement agglomerative clustering. Initially, the function was used with its default parameters with the exception of the number of clusters, which was set to 3. With its default settings, the agglomerative clustering algorithm uses a ``ward'' linkage, which minimized the variance of clusters being merged, and Euclidean affinity.
@@ -317,7 +323,7 @@ In this section, target data was introduced to the dataset in the form of drug r
 
 A LASSO regression model, which is a linear model with L1 regularization, was then fit to the data using the \verb|sklearn.linear_model.Lasso| function. The model was fit using a range of alpha values in [0.01, 0.1, 0.3, 0.5, 0.9], where the optimal weight vector is given by:
 \begin{align*}
-    w^* = \min_w \frac{1}{2n_samples}||Xw-y||_2^2 + \alpha||w||_1
+    w^* = \min_w \frac{1}{2n_{samples}}||Xw-y||_2^2 + \alpha||w||_1
 \end{align*}
 
 An analysis was done to examine how the value of alpha affects the number of features selected by the LASSO regression model. This was implemented by iterating over the alpha values and recording the number of non-zero coefficients in the weight vector. The results of this analysis are shown in Figure \ref{fig:lasso_alpha}.
@@ -357,33 +363,39 @@ Nested cross-validation is a technique used for robustly evaluating the performa
 
 Initially, inner and outer loop cross-validation (CV) folds are established employing stratification to ensure balanced representation. In this case, it was specified that the outer loop was to have 4 folds, while the inner loop was to have 3. Subsequently, a parameter grid is defined to be iterated over during hyperparameter optimization, which occurs in the inner loop of the CV process. In this case, the hyperparameter alpha was tested at values [0.01, 0.1, 0.3, 0.5, 0.9].
 
-In the outer loop, the data is partitioned into 4 distinct training (+ validation) (75\% of the data) and test sets (25\% of the data). Within each outer fold, the training data is partitioned again into 3 folds of training (66\%) and validation sets (33\%). The inner loop is used to compare the performance of each model at the specified hyperparameter values. In this case, it was known that the LASSO estimator was to be used, and therefore the inner loop was used to compare the performance using MSE. The alpha value that resulted in the lowest MSE on the validation set was then selected as the optimal hyperparameter value for the given outer fold. The model was then re-fit on the entire outer fold training set and evaluated on the unseen outer fold test set using MSE and Spearman Rank Correlation. This process was repeated for each outer fold, resulting in 4 MSE and Spearman Rank Correlation values. The average of these values was then taken as the final performance metric for the model.
+In the outer loop, the data is partitioned into 4 distinct training (75\% of the data) and test sets (25\% of the data). Within each outer fold, the training data is partitioned again into 3 folds of training (66\%) and validation sets (33\%). The inner loop is used to compare the performance of each model at the specified hyperparameter values. In this case, it was known that the LASSO estimator was to be used, so correspondingly model performance was evaluated in the inner loop using MSE. 
+
+The alpha value that results in the lowest MSE in the inner loop cross validation is then used in the model to be evaluated in the outer loop. The model is re-fit on the entire outer fold training set, and evaluated on the unseen test set using MSE and Spearman Rank Correlation. This process is repeated for each outer fold, resulting in 4 MSE and Spearman Rank Correlation values. The average of these values is then taken as the final performance metric for the model.
 
 \subsection{Implementation}
 The procedure outlined above was implemented in Python using Scikit-learn. 
 
-The \verb|sklearn.model_selection.KFold| method was used to define the outer and inner loops desired. First, the feature data was split via the outer loop object and then loop was constructed iterate over each outer fold. Within each fold, the data was partitioned into its train and test subsets. 
+The \verb|sklearn.model_selection.KFold| method was used to define the outer and inner loops desired. First, the feature data was split via the outer loop object and then a for-loop was constructed to iterate over each outer fold. Within each outer fold, the data was partitioned into train and validation subsets to be used in the inner loops. 
 
-The \verb|sklearn.model_selection.GridSearchCV| object parameterized by a LASSO estimator, the parameter grid, and the inner loop folds was then used to perform the inner loop CV process. The grid search object automatically optimizes the hyperparameters of the estimator based on the inner loop CV process, refits the model on the entire outer fold training set, and then can return various metrics such as the optimal hyperparameter value and the best estimator. The best estimator was then used to predict the test set of the outer fold, and the MSE and Spearman Rank Correlation were computed. This process was repeated for each outer fold, and the average MSE and Spearman Rank Correlation were computed. Note that the Spearman Rank Correlation was computed using the \verb|scipy.stats.spearmanr| function.
+The \verb|sklearn.model_selection.GridSearchCV| object parameterized by a LASSO estimator, the parameter grid, and the inner loop fold object was then used to perform the inner loop CV process. The grid search object automatically optimized the hyperparameters of the estimator based on the inner loop CV, refit the model on the entire outer fold training set, and then was able to return various metrics such as the optimal hyperparameter value and the best estimator model. The best estimator was then used to predict the test set of the outer fold with its performance evaluated by MSE and Spearman Rank Correlation. 
 
-\subsection{Results}
+This process was repeated for each outer fold, and the average MSE and Spearman Rank Correlation were computed. Note that the Spearman Rank Correlation was computed using the \verb|scipy.stats.spearmanr| function.
+
+\subsection{Cross-Validation Results}
 The results of the nested cross-validation process at each outer loop fold are shown in Table \ref{tab:regression_results}.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|}
         \hline
-        Alpha & Mean Squared Error & Spearman Correlation & p-value \\
+        Outer Fold & Alpha & Mean Squared Error & Spearman Correlation & p-value \\
         \hline
-        0.1 & 2.308 & 0.323 & $1.1 \times 10^{-6}$ \\
-        0.1 & 2.258 & 0.341 & $2.0 \times 10^{-7}$ \\
-        0.1 & 2.93 & 0.317 & $1.8 \times 10^{-6}$ \\
-        0.1 & 2.306 & 0.344 & $2.0 \times 10^{-7}$ \\
+        1 & 0.1 & 2.308 & 0.323 & $1.1 \times 10^{-6}$ \\
+        2 & 0.1 & 2.258 & 0.341 & $2.0 \times 10^{-7}$ \\
+        3 & 0.1 & 2.93 & 0.317 & $1.8 \times 10^{-6}$ \\
+        4 & 0.1 & 2.306 & 0.344 & $2.0 \times 10^{-7}$ \\
         \hline
     \end{tabular}
     \caption{Results of the nested cross-validation process.}
     \label{tab:regression_results}
 \end{table}
+
+\vspace{-0.5cm}
 
 The Spearman Rank Correlation at each outer loop fold was found to be statistically significant at a significance level of less than 0.05. Thus, the average MSE and Spearman Rank Correlation of a LASSO regression model were found to be \textbf{2.451} and \textbf{0.331} respectively.
 
