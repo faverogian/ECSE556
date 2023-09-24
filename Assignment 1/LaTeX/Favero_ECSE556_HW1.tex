@@ -410,13 +410,14 @@ The results of this comparison are shown in Table \ref{tab:regression_baseline}.
     \centering
     \begin{tabular}{|c|c|c|}
         \hline
-        Dummy Model & MSE & Spearman Rank Correlation \\
+        Model & MSE & Spearman Rank Correlation \\
         \hline
         Mean & 2.780 & NaN \\
         Median & 2.798 & NaN \\
+        LASSO & 2.451 & 0.331 \\
         \hline
     \end{tabular}
-    \caption{Results of the dummy models.}
+    \caption{Comparison of models.}
     \label{tab:regression_baseline}
 \end{table}
 
@@ -424,7 +425,7 @@ The results of this comparison are shown in Table \ref{tab:regression_baseline}.
 
 The LASSO regression model was found to outperform both the mean and median dummy models in MSE and Spearman Rank Correlation.
 
-\section{Discussion}
+\subsection{Discussion}
 
 \newpage
 
