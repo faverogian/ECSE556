@@ -311,7 +311,7 @@ From these observations a more clear understanding of the gene expression data c
 
 Both UMAP and t-SNE reduction showed that tight clusters form in the data at lower dimensions. This sense of structure causes Euclidean and cosine distance metrics to perform similarly - it is not until the structure itself is modified that these two distance metrics will disagree with each other. In this case, removing samples does not seem to change the structure of the data enough to note any differences. However, removing features (until there are only approx. 300) changes the dimensionality and structure of the data enough to highlight the difference in these two clustering methods. The clusters produced by the two distance metrics are still very similar, but not identical.
 
-\section{Regression}
+\section{Part 3: Regression}
 
 \subsection{Regularization Analysis}
 In this section, target data was introduced to the dataset in the form of drug response data. The drug response vector was aligned with the gene expression data, with all instances being aligned with the same drug response value, and instances with no drug response data being removed. The feature data was then normalized using the \verb|sklearn.preprocessing.StandardScaler| function for convergence of the regression model. A non-normalized version of the feature data was also used, and the results are shown in Appendix \ref{app:A}.
@@ -434,7 +434,7 @@ A more detailed analysis of state-of-the-art models would be required to determi
 
 \newpage
 \appendix
-\section{Regression on Non-Normalized Feature Data}\label{app:A}
+\section{Part 3a: Regression (Non-Normalized Data)}\label{app:A}
 
 When the algorithm was run on non-normalized feature data, the resulting warning was outputted: \textit{``ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation''}. 
 
