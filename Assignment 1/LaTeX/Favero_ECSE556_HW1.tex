@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -49,7 +49,7 @@ Dimensionality reduction is a technique used to reduce the number of features in
 Several dimensionality reduction techniques are explored in this assignment. These include Principal Component Analysis (PCA), UMAP, and t-SNE algorithms.
 
 \subsection{Theory}
-\subsubsection{Principal Component Analysis}
+\subsubsection*{Principal Component Analysis}
 The following is adapted from Goodfellow et al. \cite{GoodBengCour16}.
 
 For a set of \textit{m} data points $\textbf{x}^{(i)}$ $\in$ $\mathbb{R}^n$, PCA finds a lower dimensional representation of the data by representing it as a code vector $\textbf{c}^{(i)}$ $\in$ $\mathbb{R}^l$ where $l < n$. The goal of PCA is to find a function $f$ such that $\textbf{c}^{(i)}$ = $f(\textbf{x}^{(i)})$ and a decoding function $g$ which provides $\textbf{x} \approx g(f(\textbf{x}))$. This is simply done using a decoding matrix, $\textbf{D} \in \mathbb{R}^{n \times l}$ which has columns that are orthogonal and have a unit norm. Following this, the code vector is given by:
@@ -65,13 +65,13 @@ Using a closed-form or numerical optimization method, the decoding matrix can be
  
 $l$ is typically the only parameter selected by the user. For visual purposes, $l$ is typically chosen as 2 such that the compressed data can be plotted on a Cartesian plane.
 
-\subsubsection{t-SNE}
-t-SNE was proposed by Van der Maaten et al. \cite{vanDerMaaten2008} as a technique for visualizing high-dimensional data. At a high-level, the algorithm maps each data point to a location on a 2D or 3D map that can reveal the structure at many scales. The resulting map effectively reveals low-dimensional manifolds on which the data points lie.
+\subsubsection*{t-SNE}
+t-SNE was proposed by Van der Maaten et al. \cite{vanDerMaaten2008} as a stochastic technique for visualizing high-dimensional data. At a high-level, the algorithm maps each data point to a location on a 2D or 3D map that can reveal the structure at many scales. The resulting map effectively reveals low-dimensional manifolds on which the data points lie - the more similar the data points are, the closer they are placed to each other on the map.
 
 t-SNE algorithms are incorporated into the \verb|scikit-learn| Python library. The algorithm is capable of optimizing a dimensionality reduction on a dataset based on a number of parameters selected by a user. Some of these include the number of dimensions and the perplexity, which dictate the manner in which the algorithm structures the lower-dimension manifolds in which the data lies.
 
-\subsubsection{UMAP}
-UMAP is a novel non-linear manifold learning technique by McInnes et al. \cite{mcinnes_umap_2020}. UMAP is a scalable algorithm that is comparable to t-SNE in visualization, but superior in runtime and preservation of global structure.
+\subsubsection*{UMAP}
+UMAP is a novel non-linear manifold learning technique by McInnes et al. \cite{mcinnes_umap_2020}. UMAP is a scalable algorithm that is comparable to t-SNE in visualization, but superior in preservation of global structure and runtime.
 
 UMAP algorithms have been abstracted into a Python library, \verb|umap-learn|, which is capable of optimizing a dimensionality reduction on a dataset based on a number of parameters selected by a user. Some of these include the number of dimensions, the number of neighbors and the minimum distance between points, which play roles in the generalization of the algorithm, the trends identified (local or global), and the distinction between clusters.
 
@@ -114,7 +114,23 @@ In addition to the visual inspection of the plots, the runtime of each technique
 
 A point to note is that while both UMAP and t-SNE have generated distinct clusters, the clusters are not identical in shape or density. UMAP has produced denser clusters that are closer to the origin, while t-SNE has produced a similar amount of clusters that are more spread out, both in terms of point-to-point and cluster-to-cluster. To examine the non-linear techniques further, parameters of interest were changed in isolation to analyze their effect on the resulting plots. 
 
-\subsubsection{UMAP Parameter Analysis}
+\subsubsection*{Effect of Scaling}
+The effect of scaling the data was analyzed by implementing the dimensionality reduction techniques on the scaled data. The data was scaled using the \\ \verb|sklearn.preprocessing.StandardScaler| function. The results of this implementation are shown in Figure \ref{fig:scaled_dimred}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/scaled_dimred.png}
+    \caption{PCA (left), UMAP (middle), and t-SNE (right) reduction using scaled feature data.}
+    \label{fig:scaled_dimred}
+\end{figure}
+
+\vspace{-0.5cm}
+
+Scaling the data had a significant effect on the PCA plot but less of an effect on UMAP and t-SNE. The PCA plot now shows two denser regions of points, but none to the extent of the clusters of data points grouped by the other two algorithms. The UMAP and t-SNE plots are visually similar to the plots generated using the unscaled data.
+
+This micro-experiment demonstrates the importance of scaling the data in certain scenarios, like when conducting a PCA. In doing so, it can be ensured that the data is not biased towards features with larger variances. 
+
+\subsubsection*{UMAP Parameter Analysis}
 A sequence of reductions with varying number of neighbors in UMAP is observed in Figure \ref{fig:UMAP_vary}.
 
 \begin{figure}[H]
@@ -143,7 +159,7 @@ From inspection, the minimum distance parameter seems to have a spread effect on
 
 Depending on the objective of the dimensionality reduction, both the number of neighbors and the minimum distance parameters can be used to control the generalization of the algorithm. If the goal is to identify broad trends in the data, then a higher number of neighbors and a lower minimum distance should be used. If the goal is to identify local trends in the data, then a lower number of neighbors and a higher minimum distance should be used.
 
-\subsubsection{t-SNE Parameter Analysis}
+\subsubsection*{t-SNE Parameter Analysis}
 A sequence of reductions with varying perplexity in t-SNE is observed in Figure \ref{fig:TSNE_vary}.
 
 \begin{figure}[H]
@@ -163,25 +179,27 @@ Again, depending on the objective of the dimensionality reduction, the perplexit
 \begin{enumerate}
     \item \textbf{Do you see different clusters forming (visually)? How much correspondence exist between clusters that you find in different methods?}
 
-    Different clusters formed visually in the UMAP and t-SNE plots. The clusters in the UMAP plot were denser and closer to the origin, while the clusters in the t-SNE plot were more spread out. The clusters in the PCA plot were not visually discernible.  
+    Different clusters formed visually in the UMAP and t-SNE plots. The clusters in the UMAP plot were denser and closer to the origin, while the clusters in the t-SNE plot were more spread out. The clusters in the PCA plot were not visually discernible. On the scaled data, it is hard to define exactly how many clusters were formed in the PCA, UMAP, and t-SNE plots, but it appears that there were approximately 3 clusters in each.
 
-    Varying the parameters of both the UMAP and t-SNE algorithms resulted in different clusters being formed. The number of clusters identified by the algorithms decreased as the number of neighbors or perplexity increased. This is due to the fact that considering more neighbors or a higher perplexity captures broader trends in the data, while considering fewer neighbors or a lower perplexity captures more local trends. Therefore, the non-linear techniques are surely capable of producing high correspondence, but the parameters must be tuned to achieve this correspondence. However, neither UMAP nor t-SNE had correspondence with the PCA plot.
+    Varying the parameters of both the UMAP and t-SNE algorithms resulted in different clusters being formed. The number of clusters identified by the algorithms decreased as the number of neighbors or perplexity increased. This is due to the fact that considering more neighbors or a higher perplexity captures broader trends in the data, while considering fewer neighbors or a lower perplexity captures more local trends. Therefore, the non-linear techniques are surely capable of producing high correspondence, but the parameters must be tuned to achieve this correspondence. However, neither UMAP nor t-SNE had striking correspondence with the PCA plot.
+
+    It should be mentioned also that UMAP and t-SNE have some element of randomness involved (UMAP contains a random initialization, t-SNE contains a random seed). Therefore, the results of the algorithms will never be fully reproducible, or have high correspondence with itself when run multiple times. 
 
     \item \textbf{What is the difference between the three methods above? Use pros/cons to compare them against each other.}
     
-    PCA is a fast algorithm (was the fastest of the three), is computationally efficient, scaled well with this large dataset, and is highly interpretable. However, PCA assumes that linear relationships are present in the data, and is therefore not suitable for datasets with non-linear relationships. In these cases, a loss of local structure can occur. It appears that the linear assumption did not hold particularly well with this dataset, as the PCA plot did not show any discernible preserved structure.
+    PCA is a fast algorithm (was the fastest of the three), is computationally efficient, scaled well with this large dataset, and is highly interpretable. However, PCA assumes that linear relationships are present in the data, and is therefore not suitable for datasets with non-linear relationships. In these cases, a loss of local structure can occur. It appears that the linear assumption did not hold particularly well with this dataset, as the PCA plot did not show any discernible preserved structure. Finally, PCA was sensitive to scaling of the data, while the other two algorithms were not. When the data was scaled, PCA was performed more effectively, showing its sensitivity to bias towards features with larger variances.
 
-    UMAP is a non-linear, highly customizable, dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the local and global structure of the data. In this implementation, UMAP was the slowest of the three algorithms as a result of its high degree of complexity. However, it was best suited for this dataset as it was able to capture the non-linear relationships in the data and produce dense clusters from the data capturing both local and global trends.
+    UMAP is a non-linear, highly customizable, dimensionality reduction technique that is capable of reducing the dimensionality of a dataset while preserving the local and global structure of the data. In this implementation, UMAP was experimentally found to be the slowest of the three algorithms as a result of its high degree of complexity (however, in theory, should scale better than t-SNE with more data). This complexity also leads to lesser interpretability as well. However, it was well suited for this dataset as it was able to capture the non-linear relationships in the data and produce dense clusters from the data capturing both local and global trends. Finally, UMAP was not sensitive to scaling of the data, but is based on a random initialization and therefore is not fully reproducible.
 
-    t-SNE is another non-linear dimensionality reduction technique that was effective in identifying relationships in the gene expression data. Like UMAP, it appeared to be effective in preserving local structures in the data. Further, t-SNE was faster than UMAP, but could not generate clusters as dense on a 2D plot. However, like UMAP, t-SNE is tunable and can be used to capture local trends in the data effectively. 
+    t-SNE is another non-linear dimensionality reduction technique that was effective in identifying relationships in the gene expression data. Like UMAP, it appeared to be effective in preserving local structures in the data, but was less effective in preserving global structures. Further, t-SNE was faster than UMAP in this experiment, but could not generate clusters as dense on a 2D plot. However, like UMAP, t-SNE is tunable and can be used to capture local trends in the data effectively. Finally, the stochastic nature of t-SNE makes it difficult to reproduce results.
 \end{enumerate}
 
 \section{Part 2: Clustering}
 \subsection{Theory}
-\subsubsection{Agglomerative Clustering}
+\subsubsection*{Agglomerative Clustering}
 Agglomerative clustering is a clustering approach that works by first partitioning a dataset into singleton clusters, and then iteratively merging the clusters together until there is only one cluster remaining \cite{mullner_modern_2011}. There are several parameters that govern the algorithm: linkage, distance metric, and, obviously, the number of clusters. Linkage refers to the method used to calculate the distance between clusters, while the distance metric refers to the method used to calculate the distance between points. 
 
-\subsubsection{K-Means Clustering}
+\subsubsection*{K-Means Clustering}
 K-means clustering is a traditional unsupervised algorithm used to partition a dataset into $k$ clusters. The algorithm works by first initializing $k$ centroids, iteratively assigning each point to the cluster with the closest centroid, and then updating the centroids based on the new cluster assignments until a steady state is reached. The algorithm is sensitive to the initial centroid positions, and therefore, the algorithm is typically run multiple times with different initialization to ensure that the global minimum is reached.
 
 \subsection{Implementation}
@@ -189,7 +207,9 @@ The \verb|sk.learn.cluster.AgglomerativeClustering| function was used to impleme
 
 The \verb|sklearn.cluster.KMeans| function was used to implement K-means clustering with a specification of 3 clusters. Given that the initial clusters are assigned randomly, the following results are based on an individual run of the algorithm and are therefore are not fully reproducible without setting a random seed.
 
-\subsubsection{Jaccard Similarity with Default Parameters}
+As seen in the previous section, scaling the data is imperative for distance-based algorithms which are heavily influenced by variance. Therefore, the data was normalized before implementing the clustering algorithms.
+
+\subsubsection*{Jaccard Similarity with Default Parameters}
 The computed clusters of each algorithm were compared using the Jaccard similarity metric implemented via the \verb|sklearn.metrics.jaccard_score| function. An iterative approach was conducted to compute the similarity of the nine permutations of the three algorithms. The results of this approach are shown in Table \ref{tab:jaccard_default}. Note that the rows represent the clusters computed by the agglomerative algorithm, while the columns represent the clusters computed by the K-means clustering algorithm.
 
 \begin{table}[H]
@@ -198,9 +218,9 @@ The computed clusters of each algorithm were compared using the Jaccard similari
         \hline 
         \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
         \hline
-        \textbf{Cluster 1} & 0.892 & 0.000 & 0.044 \\
-        \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
-        \textbf{Cluster 3} & 0.022 & 0.000 & 0.864 \\
+        \textbf{Cluster 1} & 0.952 & 0.032 & 0.001 \\
+        \textbf{Cluster 2} & 0.006 & 0.821 & 0.000 \\
+        \textbf{Cluster 3} & 0.000 & 0.006 & 0.982 \\
         \hline
     \end{tabular}
     \caption{Jaccard similarity of the clusters using default parameters.}
@@ -211,110 +231,117 @@ The computed clusters of each algorithm were compared using the Jaccard similari
 
 The Jaccard similarity metric is a measure of the similarity between two sets. The metric is defined as the size of the intersection of the sets divided by the size of the union of the sets. In this case, the sets are the clusters identified by the algorithms. The Jaccard similarity metric is a value between 0 and 1, where 0 indicates no similarity and 1 indicates perfect similarity. From Table \ref{tab:jaccard_default}, it can be seen that the clusters identified by the algorithms are not identical, however there is a high degree of similarity. Note that the values were rounded to 3 decimal places for readability. 
 
-\subsubsection{Rand Index with Default Parameters}
-The computed clusters of each algorithm were compared using the Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the Rand-index of the two algorithms at default parameters was approximately \textbf{0.918}, on a scale from 0 to 1, with 1 indicating perfect correspondence.
+\subsubsection*{Rand Index with Default Parameters}
+The computed clusters of each algorithm were compared using the Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the Rand-index of the two algorithms at default parameters was approximately \textbf{0.946}, on a scale from 0 to 1, with 1 indicating perfect correspondence.
 
-\subsubsection{Adjusted Rand Index with Default Parameters}
-The computed clusters of each algorithm were compared using the adjusted Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the adjusted Rand-index of the two algorithms at default parameters was approximately \textbf{0.825}, on a scale from -1 to 1, with -1 indicating disagreement, 0 indicating randomness, and 1 indicating a perfect correspondence.
+\subsubsection*{Adjusted Rand Index with Default Parameters}
+The computed clusters of each algorithm were compared using the adjusted Rand index metric implemented via the \verb|sklearn.metrics.adjusted_rand_score| function. Adjusting for 3 decimal places, the adjusted Rand-index of the two algorithms at default parameters was approximately \textbf{0.893}, on a scale from -1 to 1, with -1 indicating disagreement, 0 indicating randomness, and 1 indicating a perfect correspondence.
 
 Clearly, both indexes suggest that the clusters identified by the algorithms are not identical, however there is a high degree of similarity.
 
-\subsection{Analysis of Agglomerative Clustering}
-Agglomerative clustering was implemented separately with average linkage and Euclidean and cosine distance metrics. A Jaccard similarity analysis of this implementation are shown in Table \ref{tab:average_agglo}.
+\subsubsection*{Visualization}
+The clustering algorithms were also compared visually.
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|c|c|c|c|}
-        \hline 
-        \diagbox{Euclidean}{Cosine} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
-        \hline
-        \textbf{Cluster 1} & 1.000 & 0.000 & 0.000 \\
-        \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
-        \textbf{Cluster 3} & 0.000 & 0.000 & 1.000 \\
-        \hline
-    \end{tabular}
-    \caption{Jaccard similarity of the clusters using average linkage and Euclidean and cosine distance.}
-    \label{tab:average_agglo}
-\end{table}
-
-\vspace{-0.5cm}
-
-Interestingly, the clusters produced by the average linkage algorithm are identical regardless of the distance metric used. Correspondingly, the Rand-Index and adjusted Rand-Index were found to be \textbf{1.0}. Therefore, it can be concluded that the clusters produced by the average linkage algorithm are identical regardless of the distance metric used for this dataset.
-
-A further analysis was conducted to examine the similarity between the clusters produced by the average linkage algorithm and the K-means algorithm. The results of this analysis are shown in Table \ref{tab:agglo_euc}.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|c|c|c|c|}
-        \hline 
-        \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
-        \hline
-        \textbf{Cluster 1} & 0.475 & 0.002 & 0.000 \\
-        \textbf{Cluster 2} & 0.174 & 0.000 & 0.000 \\
-        \textbf{Cluster 3} & 0.349 & 0.000 & 0.017 \\
-        \hline
-    \end{tabular}
-    \caption{Jaccard similarity of the clusters using average linkage and K-means.}
-    \label{tab:agglo_euc}
-\end{table}
-
-\vspace{-0.5cm}
-
-In addition to the Jaccard similarity metric, the Rand index and adjusted Rand index were also computed. The Rand index was approximately \textbf{0.382}, while the adjusted Rand index was approximately \textbf{0.0}.
-
-Average linkage clustering with Euclidean and cosine distance metrics produced clusters that were not similar to the clusters produced by the K-means algorithm. In retrospect, this aligns well with expectation. Both ward linkage and K-means techniques aim to minimize cluster variance and create clusters that are of roughly equal shape and size. Average linkage techniques, on the other hand, take into account the mean distance between all points in neighboring clusters. As a result, clusters formed can be of abnormal shapes and sizes. 
-
-\subsubsection{Analysis of Agglomerative Clustering on Subsets of the Data}
-The agglomerative clustering algorithm was implemented on subsets of the data to observe why both Euclidean and cosine distance metrics produced identical clusters. 
-
-First, subsets of the data were created by only including randomly selected features from the data. The agglomerative clustering algorithm was then implemented on the subsets of the data using Euclidean and cosine distance metrics. The results of this analysis are shown in Table \ref{tab:agglo_euc_sub}.
-
-\begin{table}[H]
+\begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|c|}
-        \hline 
-        \textbf{Number of Features} & \textbf{Rand Score} & \textbf{Adjusted Rand Score} \\
-        \hline
-        25 & 0.996 & 0.831 \\
-        100 & 0.996 & 0.855 \\
-        200 & 0.998 & 0.922 \\
-        300 & 1.0 & 1.0 \\
-        \hline
+    \hline
+    Cluster & Agglomerative & K-Means \\
+    \hline
+    Cluster 1 & 633 & 655 \\
+    Cluster 2 & 179 & 156 \\
+    Cluster 3 & 167 & 168 \\
+    \hline
     \end{tabular}
-    \caption{Similarity of the clusters using average linkage and Euclidean and cosine distance on feature subsets of the data.}
-    \label{tab:agglo_euc_sub}
+    \caption{Number of Samples in Each Cluster (Default)}
+    \label{tab:default_clusters_prop}
 \end{table}
+
+The algorithms have approximately the same number of points in each cluster, as seen in Table \ref{tab:default_clusters_prop}
+
+Visually, the clusters formed were analyzed by plotting the data points in each cluster on a 2D plot reduced via PCA. The results of this analysis are shown in Figure \ref{fig:cluster_visual}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Images/cluster visual.png}
+    \caption{PCA reduction of the data with clusters identified by agglomerative clustering (left) and K-means clustering (right).}
+    \label{fig:cluster_visual}
+\end{figure}
 
 \vspace{-0.5cm}
 
-Next, subsets of the data were created by only including randomly selected samples from the data. The agglomerative clustering algorithm was then implemented on the subsets of the data using Euclidean and cosine distance metrics. The results of this analysis are shown in Table \ref{tab:agglo_euc_sub2}.
+The color mapping was chosen to highlight the clusters identified by the algorithms. Confirmed visually, the clusters formed by the two algorithms are nearly identical.
+
+\subsection{Analysis of Agglomerative Clustering}
+Agglomerative clustering was implemented separately with average linkage and Euclidean and cosine distance metrics. An additional analysis done on non-normalized data can be found in Appendix \ref{app:A}. 
+
+\subsubsection*{Jaccard Similarity with Average Linkage}
+The Jaccard similarity of the clusters identified by the algorithms with average linkage is shown in Table \ref{tab:jaccard_average_linkage}.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|c|} 
+    \begin{tabular}{|c|c|c|c|}
+        \hline 
+        \diagbox{Cosine}{Euclidean} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
         \hline
-        \textbf{Number of Samples} & \textbf{Rand Score} & \textbf{Adjusted Rand Score} \\
-        \hline
-        25 & 1.0 & 1.0 \\
-        100 & 1.0 & 1.0 \\
-        200 & 1.0 & 1.0 \\
-        300 & 1.0 & 1.0 \\
+        \textbf{Cluster 1} & 0.351 & 0.000 & 0.000 \\
+        \textbf{Cluster 2} & 0.353 & 0.000 & 0.003 \\
+        \textbf{Cluster 3} & 0.296 & 0.003 & 0.000 \\
         \hline
     \end{tabular}
-    \caption{Similarity of the clusters using average linkage and Euclidean and cosine distance on sample subsets of the data.}
-    \label{tab:agglo_euc_sub2}
+    \caption{Jaccard similarity of the clusters using average linkage.}
+    \label{tab:jaccard_average_linkage}
 \end{table}
 
 \vspace{-0.5cm}
 
-From these observations a more clear understanding of the gene expression data can be conveyed. Here, it is seen that removing samples does not result in the two distance metrics producing different clusters. However, removing features does. This could be related to the dimensionality reduction analysis done prior. 
+It can be seen that the clusters formed by the average linkage algorithms are not very pairwise similar to each other according to the Jaccard score. Notably, cluster 1 from the algorithm using the Euclidean distance metric is nearly one-third similar to each of the clusters identified by the algorithm using the cosine distance metric. 
 
-Both UMAP and t-SNE reduction showed that tight clusters form in the data at lower dimensions. This sense of structure causes Euclidean and cosine distance metrics to perform similarly - it is not until the structure itself is modified that these two distance metrics will disagree with each other. In this case, removing samples does not seem to change the structure of the data enough to note any differences. However, removing features (until there are only approx. 300) changes the dimensionality and structure of the data enough to highlight the difference in these two clustering methods. The clusters produced by the two distance metrics are still very similar, but not identical.
+\subsubsection*{Rand Index with Average Linkage}
+Adjusting for 3 decimal places, the Rand-index of the two algorithms with average linkage was approximately \textbf{0.336}, on a scale from 0 to 1, with 1 indicating perfect correspondence.
 
+\subsubsection*{Adjusted Rand Index with Average Linkage}
+Adjusting for 3 decimal places, the adjusted Rand-index of the two algorithms with average linkage was approximately \textbf{0.0}, on a scale from -1 to 1, with -1 indicating disagreement, 0 indicating randomness, and 1 indicating a perfect correspondence.
+
+\subsubsection*{Visualization}
+Table \ref{tab:average_clusters_prop} shows the distribution of samples in each cluster for the average linkage algorithms.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    Cluster & Euclidean & Cosine \\
+    \hline
+    Cluster 1 & 977 & 343 \\
+    Cluster 2 & 1 & 346 \\
+    Cluster 3 & 1 & 290 \\
+    \hline
+    \end{tabular}
+    \caption{Number of Samples in Each Cluster (Average Linkage)}
+    \label{tab:average_clusters_prop}
+\end{table}
+
+The clusters formed by the algorithms with average linkage were analyzed visually by plotting the data points in each cluster on a 2D plot reduced via PCA. The results of this analysis are shown in Figure \ref{fig:cluster_visual_average_linkage}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Images/average linkage cluster visual.png}
+    \caption{PCA reduction of the data with clusters identified by agglomerative clustering with average linkage.}
+    \label{fig:cluster_visual_average_linkage}
+\end{figure}
+
+\vspace{-0.5cm}
+
+The agglomerative clustering algorithm using the Euclidean distance metric placed nearly every point in the same cluster! Agglomerative clustering with average linkage and the cosine distance metric seems to have done a fairly good job at forming three uniform clusters in the data. Each cluster contains roughly one-third of the data points and visually appear to be somewhat related to each other in the PCA plot. The algorithm using the Euclidean distance metric, however, has formed one massive cluster containing nearly all of the data points, with the remaining two clusters containing only one point each. 
+
+We now have an explanation for the ambiguity in the Jaccard scores, Rand-index, and adjusted Rand-index. Correspondingly, this massive cluster is approximately one-third similar to the three normal-sized clusters identified using the cosine distance metric, which is aptly represented in the Jaccard score and Rand-index metrics. 
+
+This scenario shows the relative strengths and weaknesses of the two distance metrics with high-dimensional data. Given that the feature data observed is of a very high-dimension, the ``Curse of Dimensionality'' is very clearly at play here, which causes the Euclidean distance metric to converge to a constant value. Hence, forming distinct clusters becomes a real challenge. The cosine distance metric, however, measures the cosine of the angle between two vectors. This reflects the similarity in orientation or direction of the vectors in a high-dimensional space and makes it insensitive to magnitude and sparse data. In the case of gene expression data, which is sparse and high-dimensional, the cosine distance metric is clearly a much better choice than the Euclidean distance metric.
+    
 \section{Part 3: Regression}
 
 \subsection{Regularization Analysis}
-In this section, target data was introduced to the dataset in the form of drug response data. The drug response vector was aligned with the gene expression data, with all instances being aligned with the same drug response value, and instances with no drug response data being removed. The feature data was then normalized using the \verb|sklearn.preprocessing.StandardScaler| function for convergence of the regression model. A non-normalized version of the feature data was also used, and the results are shown in Appendix \ref{app:A}.
+In this section, target data was introduced to the dataset in the form of drug response data. The drug response vector corresponding to ``Doxorubicin'' was aligned with the gene expression data, with all instances being aligned with the same drug response value, and instances with no drug response data being removed. The feature data was then normalized using for convergence of the regression model. A non-normalized version of the feature data was also used, and the results are shown in Appendix \ref{app:B}.
 
 A LASSO regression model, which is a linear model with L1 regularization, was then fit to the data using the \verb|sklearn.linear_model.Lasso| function. The model was fit using a range of alpha values in [0.01, 0.1, 0.3, 0.5, 0.9], where the optimal weight vector is given by:
 \begin{align*}
@@ -356,18 +383,14 @@ The results are also shown in Table \ref{tab:lasso_alpha}.
 As alpha increases, the sparsity of the solution increases dramatically. This is conventional with theory, as more weight is given to the L1 norm penalty and thus the optimal solution will be more sparse. With this dataset, it is seen that an alpha value of 0.5 results in a weight vector with no non-zero coefficients. 
 
 \subsection{Nested Cross-Validation}
-Nested cross-validation is a technique used for robustly evaluating the performance of machine learning models while simultaneously optimizing the hyperparameters associated with the models. 
-
-Initially, inner and outer loop cross-validation (CV) folds are established employing stratification to ensure balanced representation. In this case, it was specified that the outer loop was to have 4 folds, while the inner loop was to have 3. Subsequently, a parameter grid is defined to be iterated over during hyperparameter optimization, which occurs in the inner loop of the CV process. In this case, the hyperparameter alpha was tested at values [0.01, 0.1, 0.3, 0.5, 0.9].
+Nested cross-validation is a technique used for robustly evaluating the performance of machine learning models while simultaneously optimizing the hyperparameters associated with the models. Initially, inner and outer loop cross-validation (CV) folds are established employing stratification to ensure balanced representation. In this case, it was specified that the outer loop was to have 4 folds, while the inner loop was to have 3. Subsequently, a parameter grid is defined to be iterated over during hyperparameter optimization, which occurs in the inner loop of the CV process. In this case, the hyperparameter alpha was tested at values [0.01, 0.1, 0.3, 0.5, 0.9].
 
 In the outer loop, the data is partitioned into 4 distinct training (75\% of the data) and test sets (25\% of the data). Within each outer fold, the training data is partitioned again into 3 folds of training (66\%) and validation sets (33\%). The inner loop is used to compare the performance of each model at the specified hyperparameter values. In this case, it was known that the LASSO estimator was to be used, so correspondingly model performance was evaluated in the inner loop using MSE. 
 
 The alpha value that results in the lowest MSE in the inner loop cross validation is then used in the model to be evaluated in the outer loop. The model is re-fit on the entire outer fold training set, and evaluated on the unseen test set using MSE and Spearman Rank Correlation. This process is repeated for each outer fold, resulting in 4 MSE and Spearman Rank Correlation values. The average of these values is then taken as the final performance metric for the model.
 
 \subsection{Implementation}
-The procedure outlined above was implemented in Python using Scikit-learn. 
-
-The \verb|sklearn.model_selection.KFold| method was used to define the outer and inner loops desired. First, the feature data was split via the outer loop object and then a for-loop was constructed to iterate over each outer fold. Within each outer fold, the data was partitioned into train and validation subsets to be used in the inner loops. 
+The procedure outlined above was implemented in Python using Scikit-learn. The \\ \verb|sklearn.model_selection.KFold| method was used to define the outer and inner loops desired. First, the feature data was split via the outer loop object and then a for-loop was constructed to iterate over each outer fold. Within each outer fold, the data was partitioned into train and validation subsets to be used in the inner loops. 
 
 The \verb|sklearn.model_selection.GridSearchCV| object parameterized by a LASSO estimator, the parameter grid, and the inner loop fold object was then used to perform the inner loop CV process. The grid search object automatically optimized the hyperparameters of the estimator based on the inner loop CV, refit the model on the entire outer fold training set, and then was able to return various metrics such as the optimal hyperparameter value and the best estimator model. The best estimator was then used to predict the test set of the outer fold with its performance evaluated by MSE and Spearman Rank Correlation. 
 
@@ -384,7 +407,7 @@ The results of the nested cross-validation process at each outer loop fold are s
         \hline
         1 & 0.1 & 2.308 & 0.323 & $1.1 \times 10^{-6}$ \\
         2 & 0.1 & 2.258 & 0.341 & $2.0 \times 10^{-7}$ \\
-        3 & 0.1 & 2.93 & 0.317 & $1.8 \times 10^{-6}$ \\
+        3 & 0.1 & 2.930 & 0.317 & $1.8 \times 10^{-6}$ \\
         4 & 0.1 & 2.306 & 0.344 & $2.0 \times 10^{-7}$ \\
         \hline
     \end{tabular}
@@ -434,13 +457,136 @@ A more detailed analysis of state-of-the-art models would be required to determi
 
 \newpage
 \appendix
-\section{Part 3a: Regression (Non-Normalized Data)}\label{app:A}
+
+\section{Clustering (Non-Normalized Data)}\label{app:A}
+A similar analysis was conducted on the non-normalized data to examine the effect of scaling on the clusters produced by the agglomerative clustering algorithm. The results of this analysis are shown below.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline 
+        \diagbox{Cosine}{Euclidean} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
+        \hline
+        \textbf{Cluster 1} & 1.000 & 0.000 & 0.000 \\
+        \textbf{Cluster 2} & 0.000 & 1.000 & 0.000 \\
+        \textbf{Cluster 3} & 0.000 & 0.000 & 1.000 \\
+        \hline
+    \end{tabular}
+    \caption{Jaccard similarity of the clusters using average linkage and Euclidean and cosine distance.}
+    \label{tab:average_agglo}
+\end{table}
+
+\vspace{-0.5cm}
+
+Interestingly, when the data is not normalized, the clusters produced by the average linkage algorithm are identical regardless of the distance metric used. Correspondingly, the Rand-Index and adjusted Rand-Index were found to be \textbf{1.0}. Therefore, it can be concluded that the clusters produced by the average linkage algorithm are identical regardless of the distance metric used for this non-normalized dataset.
+
+The visualization of the clusters produced by the average linkage algorithms are shown in the Figure and Table below.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    Cluster & Euclidean & Cosine \\
+    \hline
+    Cluster 1 & 972 & 972 \\
+    Cluster 2 & 1 & 1 \\
+    Cluster 3 & 6 & 6 \\
+    \hline
+    \end{tabular}
+    \caption{Number of Samples in Each Cluster (Non-Normalized Average Linkage)}
+    \label{tab:non_normal_average_clusters_prop}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Images/non normal average linkage cluster visual.png}
+    \caption{PCA reduction of the non-normalized data with clusters identified by agglomerative clustering with average linkage.}
+    \label{fig:no_normal_cluster_visual_average_linkage}
+\end{figure}
+
+\vspace{-0.5cm}
+
+Demonstrated thoroughly, when the feature data is not scaled, the clusters produced by the average linkage algorithm are identical regardless of the distance metric used. 
+
+\begin{comment}
+A further analysis was conducted to examine the similarity between the clusters produced by the average linkage algorithm and the K-means algorithm. The results of this analysis are shown in Table \ref{tab:agglo_euc}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline 
+        \diagbox{Agg.}{K-means} & \textbf{Cluster 1} & \textbf{Cluster 2} & \textbf{Cluster 3} \\
+        \hline
+        \textbf{Cluster 1} & 0.475 & 0.002 & 0.000 \\
+        \textbf{Cluster 2} & 0.174 & 0.000 & 0.000 \\
+        \textbf{Cluster 3} & 0.349 & 0.000 & 0.017 \\
+        \hline
+    \end{tabular}
+    \caption{Jaccard similarity of the clusters using average linkage and K-means.}
+    \label{tab:agglo_euc}
+\end{table}
+
+\vspace{-0.5cm}
+
+In addition to the Jaccard similarity metric, the Rand index and adjusted Rand index were also computed. The Rand index was approximately \textbf{0.382}, while the adjusted Rand index was approximately \textbf{0.0}.
+
+Average linkage clustering with Euclidean and cosine distance metrics produced clusters that were not similar to the clusters produced by the K-means algorithm. In retrospect, this aligns well with expectation. Both ward linkage and K-means techniques aim to minimize cluster variance and create clusters that are of roughly equal shape and size. Average linkage techniques, on the other hand, take into account the mean distance between all points in neighboring clusters. As a result, clusters formed can be of abnormal shapes and sizes. 
+
+\subsection*{Analysis of Agglomerative Clustering on Subsets of the Data}
+The agglomerative clustering algorithm was implemented on subsets of the data to observe why both Euclidean and cosine distance metrics produced identical clusters. 
+
+First, subsets of the data were created by only including randomly selected features from the data. The agglomerative clustering algorithm was then implemented on the subsets of the data using Euclidean and cosine distance metrics. The results of this analysis are shown in Table \ref{tab:agglo_euc_sub}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline 
+        \textbf{Number of Features} & \textbf{Rand Score} & \textbf{Adjusted Rand Score} \\
+        \hline
+        25 & 0.996 & 0.831 \\
+        100 & 0.996 & 0.855 \\
+        200 & 0.998 & 0.922 \\
+        300 & 1.0 & 1.0 \\
+        \hline
+    \end{tabular}
+    \caption{Similarity of the clusters using average linkage and Euclidean and cosine distance on feature subsets of the data.}
+    \label{tab:agglo_euc_sub}
+\end{table}
+
+\vspace{-0.5cm}
+
+Next, subsets of the data were created by only including randomly selected samples from the data. The agglomerative clustering algorithm was then implemented on the subsets of the data using Euclidean and cosine distance metrics. The results of this analysis are shown in Table \ref{tab:agglo_euc_sub2}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|} 
+        \hline
+        \textbf{Number of Samples} & \textbf{Rand Score} & \textbf{Adjusted Rand Score} \\
+        \hline
+        25 & 1.0 & 1.0 \\
+        100 & 1.0 & 1.0 \\
+        200 & 1.0 & 1.0 \\
+        300 & 1.0 & 1.0 \\
+        \hline
+    \end{tabular}
+    \caption{Similarity of the clusters using average linkage and Euclidean and cosine distance on sample subsets of the data.}
+    \label{tab:agglo_euc_sub2}
+\end{table}
+
+\vspace{-0.5cm}
+
+From these observations a more clear understanding of the gene expression data can be conveyed. Here, it is seen that removing samples does not result in the two distance metrics producing different clusters. However, removing features does. This could be related to the dimensionality reduction analysis done prior. 
+
+Both UMAP and t-SNE reduction showed that tight clusters form in the data at lower dimensions. This sense of structure causes Euclidean and cosine distance metrics to perform similarly - it is not until the structure itself is modified that these two distance metrics will disagree with each other. In this case, removing samples does not seem to change the structure of the data enough to note any differences. However, removing features (until there are only approx. 300) changes the dimensionality and structure of the data enough to highlight the difference in these two clustering methods. The clusters produced by the two distance metrics are still very similar, but not identical.
+\end{comment}
+
+\section{Regression (Non-Normalized Data)}\label{app:B}
 
 When the algorithm was run on non-normalized feature data, the resulting warning was outputted: \textit{``ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation''}. 
 
 Note that when the algorithm was run on normalized feature data, no such warning was outputted.
 
-\subsection{Regularization Analysis}
+\subsection*{Regularization Analysis}
 
 An analysis was done to examine how the value of alpha affects the number of features selected by the LASSO regression model when the feature data was not normalized. This was implemented by iterating over the alpha values and recording the number of non-zero coefficients in the weight vector. The results of this analysis are shown in Figure \ref{fig:no_normal_lasso_alpha}.
 \begin{figure}[H]
@@ -473,14 +619,14 @@ The results are also shown in Table \ref{tab:no_normal_lasso_alpha}.
 
 As expected, as alpha increases, the sparsity of the solution increases dramatically. This is conventional with theory, as more weight is given to the L1 norm penalty and thus the optimal solution will be more sparse. With this dataset, it is seen that an alpha value of 0.9 results in a weight vector with only 1 non-zero coefficient.
 
-\subsection{Cross-Validation Results}
+\subsection*{Cross-Validation Results}
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|c|c|}
         \hline
         Outer Fold & Alpha & Mean Squared Error & Spearman Correlation & p-value \\
         \hline
-        1 & 0.3 & 2.459 & 0.28 & $2.67 \times 10^{-5}$ \\
+        1 & 0.3 & 2.459 & 0.280 & $2.67 \times 10^{-5}$ \\
         2 & 0.3 & 2.375 & 0.246 & $2.39 \times 10^{-4}$ \\
         3 & 0.3 & 3.169 & 0.228 & $6.97 \times 10^{-4}$ \\
         4 & 0.3 & 2.314 & 0.347 & $1 \times 10^{-7}$ \\
@@ -496,7 +642,7 @@ The ideal alpha value with non-normalized data was found to be 0.3. The Spearman
 
 Compared to the normalized data, the MSE and Spearman Rank Correlation values are worse. This is likely due to the fact that the data was not normalized, and therefore the LASSO regression model was not able to converge to the optimal solution.
 
-\subsection{Comparison to Baseline}
+\subsection*{Comparison to Baseline}
 The LASSO model trained on non-normalized data was compared to the mean and median dummy models. The results of this comparison are shown in Table \ref{tab:no_normal_regression_baseline}.
 
 \begin{table}[H]
@@ -518,7 +664,7 @@ The LASSO model trained on non-normalized data was compared to the mean and medi
 
 The LASSO regression model trained on non-normalized data was found to outperform both the mean and median dummy models in MSE and Spearman Rank Correlation.
 
-\subsection{Discussion}
+\subsection*{Discussion}
 In this analysis, the significance of normalizing the feature matrix data was highlighted. Clearly, a more optimal model was achieved when the LASSO model was trained on normalized data since the model was able to converge and achieve a lower MSE and higher Spearman Rank Correlation. 
 
 \end{document}
