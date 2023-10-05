@@ -48,7 +48,6 @@ Dimensionality reduction is a technique used to reduce the number of features in
 
 Several dimensionality reduction techniques are explored in this assignment. These include Principal Component Analysis (PCA), UMAP, and t-SNE algorithms.
 
-\begin{comment}
 \subsection{Theory}
 \subsubsection{Principal Component Analysis}
 The following is adapted from Goodfellow et al. \cite{GoodBengCour16}.
@@ -75,7 +74,6 @@ t-SNE algorithms are incorporated into the \verb|scikit-learn| Python library. T
 UMAP is a novel non-linear manifold learning technique by McInnes et al. \cite{mcinnes_umap_2020}. UMAP is a scalable algorithm that is comparable to t-SNE in visualization, but superior in runtime and preservation of global structure.
 
 UMAP algorithms have been abstracted into a Python library, \verb|umap-learn|, which is capable of optimizing a dimensionality reduction on a dataset based on a number of parameters selected by a user. Some of these include the number of dimensions, the number of neighbors and the minimum distance between points, which play roles in the generalization of the algorithm, the trends identified (local or global), and the distinction between clusters.
-\end{comment}
 
 \subsection{Implementation}
 Brief data pre-processing was done before implementing the different dimensionality reduction techniques. Commonly used libraries such as \verb|numpy| and \verb|matplotlib| were imported, before the data was loaded into a numpy array, stripped of its first row (instance headers) and its first column (feature headers) and transposed such that the data was in the form of a $n \times m$ matrix where $n$ is the number of instances and $m$ is the number of features.
@@ -179,15 +177,12 @@ Again, depending on the objective of the dimensionality reduction, the perplexit
 \end{enumerate}
 
 \section{Part 2: Clustering}
-
-\begin{comment}
 \subsection{Theory}
 \subsubsection{Agglomerative Clustering}
 Agglomerative clustering is a clustering approach that works by first partitioning a dataset into singleton clusters, and then iteratively merging the clusters together until there is only one cluster remaining \cite{mullner_modern_2011}. There are several parameters that govern the algorithm: linkage, distance metric, and, obviously, the number of clusters. Linkage refers to the method used to calculate the distance between clusters, while the distance metric refers to the method used to calculate the distance between points. 
 
 \subsubsection{K-Means Clustering}
 K-means clustering is a traditional unsupervised algorithm used to partition a dataset into $k$ clusters. The algorithm works by first initializing $k$ centroids, iteratively assigning each point to the cluster with the closest centroid, and then updating the centroids based on the new cluster assignments until a steady state is reached. The algorithm is sensitive to the initial centroid positions, and therefore, the algorithm is typically run multiple times with different initialization to ensure that the global minimum is reached.
-\end{comment}
 
 \subsection{Implementation}
 The \verb|sk.learn.cluster.AgglomerativeClustering| function was used to implement agglomerative clustering. Initially, the function was used with its default parameters with the exception of the number of clusters, which was set to 3. With its default settings, the agglomerative clustering algorithm uses a ``ward'' linkage, which minimized the variance of clusters being merged, and Euclidean affinity.
@@ -319,7 +314,7 @@ Both UMAP and t-SNE reduction showed that tight clusters form in the data at low
 \section{Regression}
 
 \subsection{Regularization Analysis}
-In this section, target data was introduced to the dataset in the form of drug response data. The drug response vector was aligned with the gene expression data, with all instances being aligned with the same drug response value, and instances with no drug response data being removed. The feature data was then normalized using the \verb|sklearn.preprocessing.StandardScaler| function for faster convergence of the regression model.
+In this section, target data was introduced to the dataset in the form of drug response data. The drug response vector was aligned with the gene expression data, with all instances being aligned with the same drug response value, and instances with no drug response data being removed. The feature data was then normalized using the \verb|sklearn.preprocessing.StandardScaler| function for convergence of the regression model. A non-normalized version of the feature data was also used, and the results are shown in Appendix \ref{app:A}.
 
 A LASSO regression model, which is a linear model with L1 regularization, was then fit to the data using the \verb|sklearn.linear_model.Lasso| function. The model was fit using a range of alpha values in [0.01, 0.1, 0.3, 0.5, 0.9], where the optimal weight vector is given by:
 \begin{align*}
@@ -334,6 +329,8 @@ An analysis was done to examine how the value of alpha affects the number of fea
     \caption{Number of non-zero coefficients in the weight vector as a function of alpha.}
     \label{fig:lasso_alpha}
 \end{figure}
+
+\vspace{-0.5cm}
 
 The results are also shown in Table \ref{tab:lasso_alpha}.
 
@@ -426,11 +423,102 @@ The results of this comparison are shown in Table \ref{tab:regression_baseline}.
 The LASSO regression model was found to outperform both the mean and median dummy models in MSE and Spearman Rank Correlation.
 
 \subsection{Discussion}
-Based on the MSE and Spearman Rank Correlation results alone, it can be difficult to tell the true effectiveness of the LASSO regression model. While the LASSO regression model outperformed the dummy models, the MSE and Spearman Rank Correlation values do not seem particularly good in an absolute sense. For example, the Spearman Rank Correlation value of 0.331 indicates that there is a positive correlation between the predicted and actual drug response values, but the correlation is not particularly strong. A more detailed analysis of state-of-the-art models would be required to determine the true effectiveness of the designed LASSO regression model.
+Based on the MSE and Spearman Rank Correlation results alone, it can be difficult to tell the true effectiveness of the LASSO regression model. While the LASSO regression model outperformed the dummy models, the MSE and Spearman Rank Correlation values do not seem particularly good in an absolute sense. For example, the Spearman Rank Correlation value of 0.331 indicates that there is a positive correlation between the predicted and actual drug response values, but the correlation is not particularly strong. 
+
+A more detailed analysis of state-of-the-art models would be required to determine the true effectiveness of the designed LASSO regression model.
 
 \newpage
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
+
+\newpage
+\appendix
+\section{Regression on Non-Normalized Feature Data}\label{app:A}
+
+When the algorithm was run on non-normalized feature data, the resulting warning was outputted: \textit{``ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation''}. 
+
+Note that when the algorithm was run on normalized feature data, no such warning was outputted.
+
+\subsection{Regularization Analysis}
+
+An analysis was done to examine how the value of alpha affects the number of features selected by the LASSO regression model when the feature data was not normalized. This was implemented by iterating over the alpha values and recording the number of non-zero coefficients in the weight vector. The results of this analysis are shown in Figure \ref{fig:no_normal_lasso_alpha}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Images/no normal regularization.png}
+    \caption{Number of non-zero coefficients in the weight vector as a function of alpha.}
+    \label{fig:no_normal_lasso_alpha}
+\end{figure}
+
+\vspace{-0.5cm}
+
+The results are also shown in Table \ref{tab:no_normal_lasso_alpha}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline 
+        \textbf{Alpha} & \textbf{Number of Non-Zero Coefficients} \\
+        \hline
+        0.01 & 770 \\
+        0.1 & 195 \\
+        0.3 & 17 \\
+        0.5 & 7 \\
+        0.9 & 1 \\
+        \hline
+    \end{tabular}
+    \caption{Number of non-zero coefficients in the weight vector as a function of alpha.}
+    \label{tab:no_normal_lasso_alpha}
+\end{table}
+
+As expected, as alpha increases, the sparsity of the solution increases dramatically. This is conventional with theory, as more weight is given to the L1 norm penalty and thus the optimal solution will be more sparse. With this dataset, it is seen that an alpha value of 0.9 results in a weight vector with only 1 non-zero coefficient.
+
+\subsection{Cross-Validation Results}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        Outer Fold & Alpha & Mean Squared Error & Spearman Correlation & p-value \\
+        \hline
+        1 & 0.3 & 2.459 & 0.28 & $2.67 \times 10^{-5}$ \\
+        2 & 0.3 & 2.375 & 0.246 & $2.39 \times 10^{-4}$ \\
+        3 & 0.3 & 3.169 & 0.228 & $6.97 \times 10^{-4}$ \\
+        4 & 0.3 & 2.314 & 0.347 & $1 \times 10^{-7}$ \\
+        \hline
+    \end{tabular}
+    \caption{Results of the nested cross-validation process.}
+    \label{tab:no_normal_regression_results}
+\end{table}
+
+\vspace{-0.5cm}
+
+The ideal alpha value with non-normalized data was found to be 0.3. The Spearman Rank Correlation at each outer loop fold was found to be statistically significant at a significance level of less than 0.05. Thus, the average MSE and Spearman Rank Correlation of a LASSO regression model were found to be \textbf{2.579} and \textbf{0.275} respectively.
+
+Compared to the normalized data, the MSE and Spearman Rank Correlation values are worse. This is likely due to the fact that the data was not normalized, and therefore the LASSO regression model was not able to converge to the optimal solution.
+
+\subsection{Comparison to Baseline}
+The LASSO model trained on non-normalized data was compared to the mean and median dummy models. The results of this comparison are shown in Table \ref{tab:no_normal_regression_baseline}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Model & MSE & Spearman Rank Correlation \\
+        \hline
+        Mean & 2.780 & NaN \\
+        Median & 2.798 & NaN \\
+        LASSO & 2.579 & 0.275 \\
+        \hline
+    \end{tabular}
+    \caption{Comparison of models.}
+    \label{tab:no_normal_regression_baseline}
+\end{table}
+
+\vspace{-0.5cm}
+
+The LASSO regression model trained on non-normalized data was found to outperform both the mean and median dummy models in MSE and Spearman Rank Correlation.
+
+\subsection{Discussion}
+In this analysis, the significance of normalizing the feature matrix data was highlighted. Clearly, a more optimal model was achieved when the LASSO model was trained on normalized data since the model was able to converge and achieve a lower MSE and higher Spearman Rank Correlation. 
 
 \end{document}
