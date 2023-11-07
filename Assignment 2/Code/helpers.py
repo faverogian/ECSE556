@@ -48,3 +48,6 @@ def nodes_to_remove(subgraphs, threshold):
             nodes_to_remove.extend(subgraph)
 
     return list(set(nodes_to_remove))
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
