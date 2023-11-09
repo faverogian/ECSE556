@@ -323,10 +323,9 @@ node_q = [0.5, 2, 4]
 node2vec_models = []
 for p in node_p:
     for q in node_q:
-        if p != q:
-            walk = node2vec.Node2Vec(G, p=p, q=q, workers=10)
-            model = walk.fit()
-            node2vec_models.append(model)
+        walk = node2vec.Node2Vec(G, p=p, q=q, workers=10)
+        model = walk.fit()
+        node2vec_models.append(model)
 
 # Save node2vec models
 for index, model in enumerate(node2vec_models):
