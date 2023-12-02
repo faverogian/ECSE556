@@ -27,6 +27,9 @@ print(edges_df.head())
 nodes = set(edges_df['Node 1'])
 nodes = nodes.union(set(edges_df['Node 2']))
 
+print('Number of nodes:', len(nodes))
+print('Number of edges:', len(edges_df))
+
 # Convert nodes to indices in edges_df
 nodes_dict = dict(zip(nodes, range(len(nodes))))
 edge_id_df = edges_df.copy()
@@ -61,15 +64,19 @@ nodes = list(nodes)
 nodes = [nodes[i] for i in range(len(nodes)) if i not in nodes_remove]
 nodes_dict = dict(zip(nodes, range(len(nodes))))
 
-# Remove nodes from edges_df
-edges_df = edges_df[~edges_df['Node 1'].isin(nodes_remove)]
-edges_df = edges_df[~edges_df['Node 2'].isin(nodes_remove)]
+# Remove rows from edges_df that contain nodes that were removed
+edges_df = edges_df[edges_df['Node 1'].isin(nodes)]
+edges_df = edges_df[edges_df['Node 2'].isin(nodes)]
 
 edges_df['Node 1'] = edges_df['Node 1'].map(nodes_dict)
 edges_df['Node 2'] = edges_df['Node 2'].map(nodes_dict)
 
 # Normalize adjacency matrix by row
 tr_mat = adj_mat / adj_mat.sum(axis=1, keepdims=True)
+
+# Print size of network
+print('Number of nodes: ', len(nodes))
+print('Number of edges: ', len(edges_df))
 
 # %% [markdown]
 # **RW No Restart**
@@ -130,6 +137,19 @@ for i in range(len(stat_dist_no_restart)):
     for j in range(i+1, len(stat_dist_no_restart)):
         spearman_corr.append(spearmanr(stat_dist_no_restart[i].flatten(), stat_dist_no_restart[j].flatten())[0])
 print('Spearman correlation between vectors: {}'.format(spearman_corr))
+
+# Graph the three vectors stacked on top of each other
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 5))
+plt.plot(stat_dist_no_restart[0], label='Node 1')
+plt.plot(stat_dist_no_restart[1], label='Node 2')
+plt.plot(stat_dist_no_restart[2], label='Node 3')
+plt.legend()
+plt.xlabel('Node')
+plt.ylabel('Probability')
+plt.title('Random Walk (No Restart) Probability Distribution')
+plt.show()
 
 # %% [markdown]
 # **RW with Restart**
@@ -243,12 +263,12 @@ for index, node in enumerate([v_N1, v_N2]):
         cosine_similarity = dot / (norm1 * norm2)
         cos_sim.append(cosine_similarity.item())
     
-    # Plot cosine similarity vs p
+    # Plot cosine similarity vs q
     plt.figure(figsize=(4, 3))
-    plt.plot(p, cos_sim, '-o')
-    plt.xlabel('p')
+    plt.plot([0, 1500, 5000], cos_sim, '-o')
+    plt.xlabel('q')
     plt.ylabel('Cosine Similarity')
-    plt.title('Cosine Similarity vs p')
+    plt.title('Cosine Similarity vs q')
     plt.ylim(0.98, 1.02)
     plt.show()
 
@@ -329,14 +349,14 @@ for p in node_p:
 
 # Save node2vec models
 for index, model in enumerate(node2vec_models):
-    model.save(f'node2vec/node2vec_model_{index}.bin')
+    model.wv.save_word2vec_format(f'node2vec/node2vec_model_{index}.bin')
 
 # %%
 from gensim.models import Word2Vec
 
 # Load node2vec models
-depth_first_model = Word2Vec.load('node2vec/node2vec_model_6.bin')
-breadth_first_model = Word2Vec.load('node2vec/node2vec_model_2.bin')
+depth_first_model = Word2Vec.load('node2vec/node2vec_model_2.bin')
+breadth_first_model = Word2Vec.load('node2vec/node2vec_model_6.bin')
 
 # %%
 # Get depth-first embeddings for first two nodes
@@ -397,11 +417,160 @@ print('Pearson: {}'.format(n2_pearsons))
 print('Spearman: {}'.format(n2_spearmans))
 print('Cosine Similarity: {}'.format(n2_cos_sim))
 
+# Get similarities between Node 1 and Node 2 embeddings
+n1_n2_pearsons = []
+n1_n2_spearmans = []
+n1_n2_cos_sim = []
+
+for i in range(len(n1_embeddings)):
+    for j in range(len(n2_embeddings)):
+        pearson = pearsonr(n1_embeddings[i], n2_embeddings[j])
+        n1_n2_pearsons.append(pearson[0])
+        spearman = spearmanr(n1_embeddings[i], n2_embeddings[j])
+        n1_n2_spearmans.append(spearman[0])
+        dot = np.dot(n1_embeddings[i].T, n2_embeddings[j])
+        norm1 = np.linalg.norm(n1_embeddings[i])
+        norm2 = np.linalg.norm(n2_embeddings[j])
+        cosine_similarity = dot / (norm1 * norm2)
+        n1_n2_cos_sim.append(cosine_similarity.item())
+
+# Print results
+print('\nNode 1 vs Node 2')
+print('Pearson: {}'.format(n1_n2_pearsons))
+print('Spearman: {}'.format(n1_n2_spearmans))
+print('Cosine Similarity: {}'.format(n1_n2_cos_sim))
+
 # %% [markdown]
-# Now, we train various node2vec models across ranges of p and q to analyze the correlations
+# We can graph the embeddings of N1 and N2 @ various values of p and q to see how these values make the embeddings more or less distinguished
 
 # %%
+p_values = [0.5, 0.5, 0.5, 2, 2, 2, 4, 4, 4]
+q_values = [0.5, 2, 4, 0.5, 2, 4, 0.5, 2, 4]
 
+node2vec_models = []
+for i in range(9):
+    node2vec_models.append(Word2Vec.load(f'node2vec/node2vec_model_{i}.bin'))
+
+# Get pearson correlation between embeddings of N1 and N2 for each model
+pearson_map = []
+for model in node2vec_models:
+    pearson = pearsonr(model.wv[N1], model.wv[N2])[0]
+    pearson_map.append(pearson)
+
+# Get spearman correlation between embeddings of N1 and N2 for each model
+spearman_map = []
+for model in node2vec_models:
+    spearman = spearmanr(model.wv[N1], model.wv[N2])[0]
+    spearman_map.append(spearman)
+
+# Plot 2 3D scatter plots of embeddings
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# x-axis: p, y-axis: q, z-axis: pearson correlation
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(p_values, q_values, pearson_map, c='r', marker='o')
+ax.set_xlabel('p')
+ax.set_ylabel('q')
+ax.set_zlabel('Pearson Correlation')
+plt.title('Pearson Correlation vs p and q')
+plt.show()
+
+# x-axis: p, y-axis: q, z-axis: spearman correlation
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(p_values, q_values, spearman_map, c='r', marker='o')
+ax.set_xlabel('p')
+ax.set_ylabel('q')
+ax.set_zlabel('Spearman Correlation')
+plt.title('Spearman Correlation vs p and q')
+plt.show()
+
+# Make table of p, q, pearson, spearman
+df = pd.DataFrame({'p': p_values, 'q': q_values, 'Pearson': pearson_map, 'Spearman': spearman_map})
+print(df)
+
+# %% [markdown]
+# **Community Detection**
+# 
+# Using the same network, we can perform a community detection with various algorithms.
+
+# %%
+import networkx as nx
+import community as community_louvain
+from networkx.algorithms import community
+
+import pickle
+
+'''# Define graph
+G = nx.from_numpy_matrix(adj_mat)
+
+# Apply Clauset-Newman-Moore algorithm
+clauset_newman_communities = list(community.greedy_modularity_communities(G))
+clauset_newman_clusters = {f'Community_{i+1}': list(community_set) for i, community_set in enumerate(clauset_newman_communities)}
+
+# Apply Louvain algorithm
+partition = community_louvain.best_partition(G)
+louvain_clusters = {f'Community_{i+1}': [node for node, community_id in partition.items() if community_id == i] for i in set(partition.values())}
+
+# Apply Girvan-Newman algorithm
+girvan_newman_communities = next(community.girvan_newman(G))
+girvan_newman_clusters = {f'Community_{i+1}': list(community_set) for i, community_set in enumerate(girvan_newman_communities)}
+
+# Save the clusters to a dictionary
+all_clusters = {
+    'Clauset_Newman_Moore': clauset_newman_clusters,
+    'Louvain': louvain_clusters,
+    'Girvan_Newman': girvan_newman_clusters
+}
+
+# Save the dictionary to a pickle file
+with open('community_clusters.pkl', 'wb') as file:
+    pickle.dump(all_clusters, file)'''
+
+print("Community clusters saved to 'community_clusters.pkl'")
+
+# %%
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import itertools
+import pickle
+
+# Load the clusters from the pickle file
+with open('Communities/community_clusters.pkl', 'rb') as file:
+    all_clusters = pickle.load(file)
+
+greedy_clusters = all_clusters['Clauset_Newman_Moore']
+greedy_color_map = {node: i for i, cluster in enumerate(greedy_clusters) for node in cluster}
+
+louvain_clusters = all_clusters['Louvain']
+louvain_color_map = {node: i for i, cluster in enumerate(louvain_clusters) for node in cluster}
+
+girvan_clusters = all_clusters['Girvan_Newman']
+girvan_color_map = {node: i for i, cluster in enumerate(girvan_clusters) for node in cluster}
+
+# Draw the graph with different colors for each cluster
+pos = nx.spring_layout(G)  # You can use different layout algorithms
+plt.figure(figsize=(12, 8))
+
+# Girvan-Newman
+plt.subplot(131)
+nx.draw(G, pos, node_color=[girvan_color_map[node] for node in G.nodes], with_labels=True, cmap='viridis')
+plt.title('Girvan-Newman')
+
+# Greedy Modularity
+plt.subplot(132)
+nx.draw(G, pos, node_color=[greedy_color_map[node] for node in G.nodes], with_labels=True, cmap='viridis')
+plt.title('Greedy Modularity')
+
+# Louvain
+plt.subplot(133)
+nx.draw(G, pos, node_color=[louvain_color_map[node] for node in G.nodes], with_labels=True, cmap='viridis')
+plt.title('Louvain')
+
+plt.tight_layout()
+plt.show()
 
 # %%
 ''' Test code for adj matrix processing '''
